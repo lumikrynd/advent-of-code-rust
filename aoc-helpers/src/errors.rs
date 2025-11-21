@@ -12,7 +12,7 @@ impl AocError {
     }
 
     pub fn from_err(msg: &str, err: impl Error) -> Self {
-        let msg = &format!("{}\n{:?}", msg, err);
+        let msg = format!("{}\n{:?}", msg, err);
         AocError::new(&msg)
     }
 }

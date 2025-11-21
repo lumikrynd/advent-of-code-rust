@@ -10,7 +10,7 @@ pub fn solve(input: &str) -> String {
     format!("part1: {}\npart2: {}", part_1, part_2)
 }
 
-fn solve_part_1(elfs: &Vec<Elf>) -> String {
+fn solve_part_1(elfs: &[Elf]) -> String {
     let result = elfs.iter()
         .map(|e| e.sum())
         .max()
@@ -19,7 +19,7 @@ fn solve_part_1(elfs: &Vec<Elf>) -> String {
     result.to_string()
 }
 
-fn solve_part_2(elfs: &Vec<Elf>) -> String {
+fn solve_part_2(elfs: &[Elf]) -> String {
     let values = elfs.iter().map(|e| e.sum());
     let sorted = BinaryHeap::from_iter(values);
 
