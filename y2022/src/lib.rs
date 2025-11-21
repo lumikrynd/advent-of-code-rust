@@ -22,28 +22,5 @@ pub fn solve_day(
 }
 
 fn get_puzzle_input(day: u8) -> Result<String, Box<dyn Error>> {
-    let path = get_path(day);
-    let content = std::fs::read_to_string(&path)?;
-    Ok(content)
-}
-
-fn get_path(day: u8) -> String {
-    format!("puzzle-input/2022/{:02}/input", day)
-}
-
-#[cfg(test)]
-mod test {
-    use crate::get_path;
-
-    #[test]
-    fn fmt_single_digit() {
-        let path = get_path(3);
-        assert_eq!(path, "puzzle-input/2022/03/input");
-    }
-
-    #[test]
-    fn fmt_double_digit() {
-        let path = get_path(42);
-        assert_eq!(path, "puzzle-input/2022/42/input");
-    }
+    aoc_helpers::get_puzzle_input(day, 2022)
 }
