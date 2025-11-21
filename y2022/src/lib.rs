@@ -21,5 +21,6 @@ pub fn solve_day(
 }
 
 fn get_puzzle_input(day: u8) -> Result<String, Box<dyn Error>> {
-    aoc_helpers::get_puzzle_input(day, 2022)
+    let date = aoc_helpers::Date::new(day, 2022);
+    aoc_helpers::get_puzzle_input(&date)
 }

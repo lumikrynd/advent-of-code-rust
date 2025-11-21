@@ -1,14 +1,16 @@
-use isahc::{Request, prelude::*};
-use std::time::Duration;
+use crate::Date;
 use crate::errors::AocError;
+use isahc::{Request, prelude::*};
 use std::error::Error;
 use std::fs;
+use std::time::Duration;
 
-pub fn fetch_input(day: u8, year: u16) -> Result<String, Box<dyn Error + 'static>> {
-    let url = get_url(day, year);
+pub fn fetch_input(date: &Date) -> Result<String, Box<dyn Error + 'static>> {
+    let url = get_url(date);
     let cookie = fs::read_to_string("puzzle-input/cookie")
         .map_err(|err| AocError::from_err("Failed to get cookie", err))?
-        .trim().to_string();
+        .trim()
+        .to_string();
 
     let mut response = Request::post(&url)
         .header("Cookie", &cookie)
@@ -26,7 +28,7 @@ pub fn fetch_input(day: u8, year: u16) -> Result<String, Box<dyn Error + 'static
     }
 }
 
-pub fn get_url(day: u8, year: u16) -> String {
+pub fn get_url(Date { day, year }: &Date) -> String {
     format!("https://adventofcode.com/{year}/day/{day}/input")
 }
 
@@ -36,14 +38,13 @@ mod test {
 
     #[test]
     fn get_url_single_digit() {
-        let url = get_url(3, 2022);
+        let url = get_url(&Date::new(3, 2022));
         assert_eq!(url, "https://adventofcode.com/2022/day/3/input");
     }
 
     #[test]
     fn get_url_double_digit() {
-        let url = get_url(42, 2024);
+        let url = get_url(&Date::new(42, 2024));
         assert_eq!(url, "https://adventofcode.com/2024/day/42/input");
     }
 }
-
