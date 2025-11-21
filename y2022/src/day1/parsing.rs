@@ -1,19 +1,36 @@
 use super::Elf;
 
+enum Token {
+    Empty,
+    Food(u32),
+}
+
 pub fn parse(raw: &str) -> Vec<Elf> {
     let mut elfs = Vec::new();
-    let mut lines = raw.lines();
+    let mut tokens = raw.lines().map(to_token).peekable();
 
-    while let Some(e) = parse_elf(&mut lines) {
-        elfs.push(e);
+    while tokens.peek().is_some() {
+        if let Some(elf) = parse_elf(&mut tokens) {
+            elfs.push(elf);
+        }
     }
 
     elfs
 }
 
-fn parse_elf(lines: &mut std::str::Lines<'_>) -> Option<Elf> {
+fn to_token(line: &str) -> Token {
+    if let Result::Ok(i) = line.parse::<u32>() {
+        Token::Food(i)
+    } else if line.is_empty() {
+        Token::Empty
+    } else {
+        panic!("INVALID INPUT")
+    }
+}
+
+fn parse_elf(tokens: &mut impl Iterator<Item = Token>) -> Option<Elf> {
     let mut foods = Vec::new();
-    while let Some(food) = parse_food(lines) {
+    while let Some(Token::Food(food)) = tokens.next() {
         foods.push(food);
     }
 
@@ -21,18 +38,6 @@ fn parse_elf(lines: &mut std::str::Lines<'_>) -> Option<Elf> {
         Some(Elf::new(foods))
     } else {
         None
-    }
-}
-
-fn parse_food(lines: &mut std::str::Lines<'_>) -> Option<u32> {
-    let line = lines.next()?;
-
-    if let Result::Ok(i) = line.parse::<u32>() {
-        Some(i)
-    } else if line.is_empty() {
-        None
-    } else {
-        panic!("INVALID INPUT")
     }
 }
 
