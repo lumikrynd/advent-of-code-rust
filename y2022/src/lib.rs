@@ -1,8 +1,7 @@
-use crate::errors::AocError;
-use std::{error::Error, u8};
+use aoc_helpers::errors::AocError;
+use std::error::Error;
 
 mod day1;
-mod errors;
 
 pub fn solve_day(
     day: Option<String>,
