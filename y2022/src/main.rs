@@ -1,5 +1,15 @@
-use y2022::print_intro;
+use std::error::Error;
 
-fn main() {
-    print_intro();
+use y2022::solve_day;
+
+fn main() -> Result<(), Box<dyn Error>> {
+    let mut arguments = std::env::args().skip(1);
+
+    let day = arguments.next();
+    let test_data = arguments.next();
+
+    let result = solve_day(day, test_data)?;
+    println!("The final result:\n{}", result);
+
+    Ok(())
 }
