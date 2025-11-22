@@ -2,6 +2,7 @@ use aoc_helpers::errors::AocError;
 use std::error::Error;
 
 mod day1;
+mod day2;
 
 pub fn solve_day(
     day: Option<String>,
@@ -12,6 +13,7 @@ pub fn solve_day(
 
     match day {
         1 => Ok(day1::solve(&input)),
+        2 => Ok(day2::solve(&input)),
         _ => Err(Box::new(AocError::new("Not Implemented"))),
     }
 }
