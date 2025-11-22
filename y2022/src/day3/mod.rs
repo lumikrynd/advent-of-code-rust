@@ -146,18 +146,14 @@ mod test {
 
     #[test]
     fn part_2_calculate_badge_value() {
-        let lines = vec![
-            "AaZA",
-            "ZklFik",
-            "LOLZ",
-            "AaZA",
-            "ZklFak",
-            "LOLa",
-        ];
+        let lines = vec!["AaZA", "ZklFik", "LOLZ", "AaZA", "ZklFak", "LOLa"];
 
         let solver = Solver::new(&lines.join("\n"));
 
-        assert_eq!(solver.solve_part_2(), Some(format!("{}", value('Z') + value('a'))));
+        assert_eq!(
+            solver.solve_part_2(),
+            Some(format!("{}", value('Z') + value('a')))
+        );
     }
 
     fn char_arr(s: &str) -> Vec<char> {

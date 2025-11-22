@@ -5,10 +5,7 @@ use aoc_helpers::PuzzleSolver;
 mod parsing;
 
 fn solve_part_1(elfs: &[Elf]) -> String {
-    let result = elfs.iter()
-        .map(|e| e.sum())
-        .max()
-        .unwrap();
+    let result = elfs.iter().map(|e| e.sum()).max().unwrap();
 
     result.to_string()
 }

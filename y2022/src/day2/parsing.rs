@@ -1,9 +1,7 @@
 use super::*;
 
 pub fn parse(input: &str) -> Vec<Strategy> {
-    input.lines()
-        .map(parse_single)
-        .collect()
+    input.lines().map(parse_single).collect()
 }
 
 fn parse_single(input: &str) -> Strategy {

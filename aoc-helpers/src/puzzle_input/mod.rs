@@ -43,9 +43,7 @@ fn initiate_input_data(date: &Date) -> Result<(), Box<dyn Error>> {
 fn write_to_file(contents: &str, date: &Date) -> Result<(), Box<dyn Error>> {
     let path = get_dir_path(date);
 
-    fs::DirBuilder::new()
-        .recursive(true)
-        .create(&path)?;
+    fs::DirBuilder::new().recursive(true).create(&path)?;
 
     let path = get_path(date);
     fs::write(&path, contents)?;

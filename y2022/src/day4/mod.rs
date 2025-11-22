@@ -20,11 +20,7 @@ impl PuzzleSolver for Solver {
     }
 
     fn solve_part_2(&self) -> Option<String> {
-        let sum = self
-            .elf_pairs
-            .iter()
-            .filter(|x| x.0.overlaps(&x.1))
-            .count();
+        let sum = self.elf_pairs.iter().filter(|x| x.0.overlaps(&x.1)).count();
         Some(sum.to_string())
     }
 }
