@@ -28,8 +28,34 @@ impl PuzzleSolver for Solver {
     }
 
     fn solve_part_2(&self) -> Option<String> {
-        None
+        if !self.rucksacks.len().is_multiple_of(3) {
+            panic!("Not possible to group in groups of 3");
+        }
+
+        let mut sum = 0;
+        let mut i = self.rucksacks.iter();
+        while let (Some(a), Some(b), Some(c)) = (i.next(), i.next(), i.next()) {
+            let ch = get_intersect_value(a, b, c);
+            sum += value(ch) as u32;
+        }
+
+        Some(format!("{sum}"))
     }
+}
+
+fn get_intersect_value(a: &Rucksack, b: &Rucksack, c: &Rucksack) -> char {
+    let a = to_hashset(a.all());
+    let b = to_hashset(b.all());
+    let c = to_hashset(c.all());
+
+    let result = b.intersection(&c).copied().collect();
+    let mut result = a.intersection(&result);
+
+    let (Some(v), None) = (result.next(), result.next()) else {
+        panic!("Intersect contains more than one item");
+    };
+
+    *v
 }
 
 fn value(ch: char) -> u8 {
@@ -116,6 +142,22 @@ mod test {
         let solver = Solver::new(&lines.join("\n"));
 
         assert_eq!(solver.solve_part_1(), Some(format!("{}", 27 + 11)));
+    }
+
+    #[test]
+    fn part_2_calculate_badge_value() {
+        let lines = vec![
+            "AaZA",
+            "ZklFik",
+            "LOLZ",
+            "AaZA",
+            "ZklFak",
+            "LOLa",
+        ];
+
+        let solver = Solver::new(&lines.join("\n"));
+
+        assert_eq!(solver.solve_part_2(), Some(format!("{}", value('Z') + value('a'))));
     }
 
     fn char_arr(s: &str) -> Vec<char> {
