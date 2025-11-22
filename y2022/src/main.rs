@@ -6,9 +6,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let mut arguments = std::env::args().skip(1);
 
     let day = arguments.next();
-    let test_data = arguments.next();
-
-    let result = solve_day(day, test_data)?;
+    let result = solve_day(day)?;
     println!("The final result:\n{}", result);
 
     Ok(())

@@ -1,12 +1,6 @@
+use aoc_helpers::PuzzleSolver;
+
 mod parsing;
-
-pub fn solve(input: &str) -> String {
-    let strategies = parsing::parse(input);
-    let part_1 = solve_part_1(&strategies);
-    let part_2 = solve_part_2(&strategies);
-
-    format!("part1: {}\npart2: {}", part_1, part_2)
-}
 
 fn solve_part_1(strategies: &[Strategy]) -> String {
     let result: u32 = strategies
@@ -128,5 +122,28 @@ pub struct Strategy {
 impl Strategy {
     fn new(opponent: Move, response: Response) -> Self {
         Strategy { opponent, response }
+    }
+}
+
+pub struct Solver {
+    strategies: Vec<Strategy>,
+}
+
+impl Solver {
+    pub fn new(input: &str) -> Box<Self> {
+        let strategies = parsing::parse(input);
+        Box::new(Solver { strategies })
+    }
+}
+
+impl PuzzleSolver for Solver {
+    fn solve_part_1(&self) -> Option<String> {
+        let s = solve_part_1(&self.strategies);
+        Some(s)
+    }
+
+    fn solve_part_2(&self) -> Option<String> {
+        let s = solve_part_2(&self.strategies);
+        Some(s)
     }
 }
