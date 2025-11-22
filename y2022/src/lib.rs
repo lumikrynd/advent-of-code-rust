@@ -4,6 +4,7 @@ use std::error::Error;
 
 mod day1;
 mod day2;
+mod day3;
 
 pub fn solve_day(day: Option<String>) -> Result<String, Box<dyn Error>> {
     let day = parse_day(day)?;
@@ -18,6 +19,7 @@ fn get_solver(day: u8, input: &str) -> Result<Box<dyn PuzzleSolver>, Box<dyn Err
     let solver: Box<dyn PuzzleSolver> = match day {
         1 => day1::Solver::new(input),
         2 => day2::Solver::new(input),
+        3 => day3::Solver::new(input),
         x => Err(AocError::new(&format!("No solver for day {x}")))?,
     };
     Ok(solver)
