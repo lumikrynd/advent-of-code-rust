@@ -1,5 +1,5 @@
-use crate::day4::parsing::parse;
 use aoc_helpers::PuzzleSolver;
+use parsing::parse;
 
 mod parsing;
 
@@ -11,12 +11,21 @@ pub struct Solver {
 
 impl PuzzleSolver for Solver {
     fn solve_part_1(&self) -> Option<String> {
-        let sum = self.elf_pairs.iter().filter(|x| one_contains_other(x)).count();
+        let sum = self
+            .elf_pairs
+            .iter()
+            .filter(|x| one_contains_other(x))
+            .count();
         Some(sum.to_string())
     }
 
     fn solve_part_2(&self) -> Option<String> {
-        None
+        let sum = self
+            .elf_pairs
+            .iter()
+            .filter(|x| x.0.overlaps(&x.1))
+            .count();
+        Some(sum.to_string())
     }
 }
 
@@ -44,7 +53,18 @@ impl Range {
     }
 
     fn fully_contains(&self, other: &Self) -> bool {
-        self.start <= other.start && self.end >= other.end
+        self.contains(&other.start) && self.contains(&other.end)
+    }
+
+    fn overlaps(&self, other: &Self) -> bool {
+        self.contains(&other.start)
+            || self.contains(&other.end)
+            || other.contains(&self.start)
+            || other.contains(&self.end)
+    }
+
+    fn contains(&self, point: &u32) -> bool {
+        &self.start <= point && &self.end >= point
     }
 }
 
@@ -56,5 +76,20 @@ mod test {
     fn test_fully_contains() {
         assert!(!Range::new(1, 2).fully_contains(&Range::new(3, 4)));
         assert!(Range::new(1, 2).fully_contains(&Range::new(2, 2)));
+    }
+
+    #[test]
+    fn test_overlaps() {
+        assert!(!Range::new(1, 2).overlaps(&Range::new(3, 4)));
+
+        let a = Range::new(1, 2);
+        let b = Range::new(2, 3);
+        assert!(a.overlaps(&b));
+        assert!(b.overlaps(&a));
+
+        let a = Range::new(1, 4);
+        let b = Range::new(2, 3);
+        assert!(a.overlaps(&b));
+        assert!(b.overlaps(&a));
     }
 }
