@@ -1,3 +1,4 @@
 #fn_single_line = true
 edition = "2024"
 style_edition = "2024"
+hard_tabs = true
