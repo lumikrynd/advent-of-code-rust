@@ -146,7 +146,9 @@ mod test {
 
 	#[test]
 	fn part_2_calculate_badge_value() {
-		let lines = vec!["AaZA", "ZklFik", "LOLZ", "AaZA", "ZklFak", "LOLa"];
+		let lines = vec![
+			"AaZA", "ZklFik", "LOLZ", "AaZA", "ZklFak", "LOLa",
+		];
 
 		let solver = Solver::new(&lines.join("\n"));
 

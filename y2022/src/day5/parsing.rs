@@ -63,7 +63,7 @@ fn parse_move(m: &str) -> Result<Move, Box<dyn Error>> {
 mod test {
 	use std::result;
 
-use super::*;
+	use super::*;
 
 	#[test]
 	fn parse_move_test() {
@@ -73,10 +73,7 @@ use super::*;
 		];
 		let moves = parse_moves(&moves).unwrap();
 
-		let expected = vec![
-			Move::new(2, 3, 1),
-			Move::new(3, 1, 5),
-		];
+		let expected = vec![Move::new(2, 3, 1), Move::new(3, 1, 5)];
 
 		assert_eq!(moves, expected);
 	}
@@ -106,16 +103,15 @@ use super::*;
 
 	#[test]
 	fn full_parse() {
-		let input = String::new() +
-			"    [D]    \n" +
-			"[N] [C]    \n" +
-			"[Z] [M] [P]\n" +
-			" 1   2   3 \n" +
-			"\n" +
-			"move 1 from 2 to 3\n" +
-			"move 5 from 3 to 1" ;
+		let input = String::new()
+			+ "    [D]    \n"
+			+ "[N] [C]    \n"
+			+ "[Z] [M] [P]\n"
+			+ " 1   2   3 \n"
+			+ "\n" + "move 1 from 2 to 3\n"
+			+ "move 5 from 3 to 1";
 
-		let Solver{stacks, moves} = parse(&input).unwrap();
+		let Solver { stacks, moves } = parse(&input).unwrap();
 
 		let expected = vec![
 			Stack(vec!['Z', 'N']),
@@ -125,10 +121,7 @@ use super::*;
 
 		assert_eq!(stacks, expected);
 
-		let expected = vec![
-			Move::new(2, 3, 1),
-			Move::new(3, 1, 5),
-		];
+		let expected = vec![Move::new(2, 3, 1), Move::new(3, 1, 5)];
 
 		assert_eq!(moves, expected);
 	}

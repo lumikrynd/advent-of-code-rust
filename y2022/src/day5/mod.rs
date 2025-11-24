@@ -63,7 +63,7 @@ impl State {
 
 		let from_stack = &mut self.stacks[from];
 		let length = from_stack.len();
-		let mut crates_ : Vec<_> = from_stack.drain(length - count ..).collect();
+		let mut crates_: Vec<_> = from_stack.drain(length - count..).collect();
 
 		self.stacks[to].append(&mut crates_);
 		Ok(())
@@ -114,28 +114,28 @@ impl Move {
 
 #[cfg(test)]
 mod test {
-	use std::error::Error;
 	use super::*;
+	use std::error::Error;
 
-		#[test]
-		fn move_crates_test() -> Result<(), Box<dyn Error>>{
-			let input = vec![
-				Stack(vec!['A', 'B', 'C', 'D', 'E']),
-				Stack(vec!['F', 'G', 'H', 'I', 'J']),
-			];
+	#[test]
+	fn move_crates_test() -> Result<(), Box<dyn Error>> {
+		let input = vec![
+			Stack(vec!['A', 'B', 'C', 'D', 'E']),
+			Stack(vec!['F', 'G', 'H', 'I', 'J']),
+		];
 
-			let mut state = State::new(&input);
-			state.move_crates(1, 2, 1)?;
-			assert_eq!(state.get_final_result()?, "DE");
+		let mut state = State::new(&input);
+		state.move_crates(1, 2, 1)?;
+		assert_eq!(state.get_final_result()?, "DE");
 
-			let mut state = State::new(&input);
-			state.move_crates(2, 1, 1)?;
-			assert_eq!(state.get_final_result()?, "JI");
+		let mut state = State::new(&input);
+		state.move_crates(2, 1, 1)?;
+		assert_eq!(state.get_final_result()?, "JI");
 
-			let mut state = State::new(&input);
-			state.move_crates(2, 1, 2)?;
-			assert_eq!(state.get_final_result()?, "JH");
+		let mut state = State::new(&input);
+		state.move_crates(2, 1, 2)?;
+		assert_eq!(state.get_final_result()?, "JH");
 
-			Ok(())
-		}
+		Ok(())
+	}
 }
