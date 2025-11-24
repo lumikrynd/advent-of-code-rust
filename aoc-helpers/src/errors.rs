@@ -11,9 +11,13 @@ impl AocError {
 		}
 	}
 
-	pub fn from_err(msg: &str, err: impl Error) -> Self {
-		let msg = format!("{}\n{:?}", msg, err);
+	pub fn from_err(message: &str, error: impl Error) -> Self {
+		let msg = format!("{}\n{:?}", message, error);
 		AocError::new(&msg)
+	}
+
+	pub fn boxed(message: &str) -> Box<Self> {
+		Box::new(Self::new(message))
 	}
 }
 
