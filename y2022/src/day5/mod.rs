@@ -1,6 +1,4 @@
-use std::ops::{Deref, DerefMut};
-
-use aoc_helpers::{PuzzleSolver, errors::AocError};
+use aoc_helpers::{PuzzleSolver, errors::AocError, wrapper};
 
 mod parsing;
 
@@ -73,7 +71,7 @@ impl State {
 		let result: String = self
 			.stacks
 			.iter()
-			.map(|f| f.0.last())
+			.map(|f| f.last())
 			.map(|f| f.unwrap())
 			.collect();
 
@@ -81,23 +79,7 @@ impl State {
 	}
 }
 
-#[derive(Debug, PartialEq, Clone)]
-pub struct Stack(Vec<char>);
-
-/// Implemented to play with it... not sure I think It's worth it.
-impl Deref for Stack {
-	type Target = Vec<char>;
-
-	fn deref(&self) -> &Self::Target {
-		&self.0
-	}
-}
-
-impl DerefMut for Stack {
-	fn deref_mut(&mut self) -> &mut Self::Target {
-		&mut self.0
-	}
-}
+wrapper!(Stack, Vec<char>);
 
 #[derive(Debug, PartialEq)]
 pub struct Move {
