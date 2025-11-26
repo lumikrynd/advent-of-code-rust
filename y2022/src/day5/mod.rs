@@ -79,7 +79,7 @@ impl State {
 	}
 }
 
-wrapper!(Stack, Vec<char>);
+wrapper!(Stack, Vec<char>, Debug);
 
 #[derive(Debug, PartialEq)]
 pub struct Move {

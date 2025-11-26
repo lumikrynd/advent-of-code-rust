@@ -1,8 +1,13 @@
+/// Creates a struct containing a single type, which implements Deref and DerefMut.
+/// Useful for having strict typing.
+/// Argument 1 is the struct name, Argument 2 the type it wraps.
+/// Any additional arguments will be passed to #[derive].
+/// PartialEq and Clone are already passed to derive and will cause an error.
 #[macro_export]
 macro_rules! wrapper {
-	($i:ident, $t:ty) => {
+	($i:ident, $t:ty $(, $item:ident) *) => {
 
-		#[derive(PartialEq, Clone, Debug)]
+		#[derive(PartialEq, Clone $(, $item)*)]
 		struct $i($t);
 
 		impl std::ops::Deref for $i {
@@ -48,8 +53,10 @@ mod test {
 		assert_eq!("hallo\nWithout mut deref\nWith mut deref", wrapper.0)
 	}
 
-	//TODO: Find a way to implement display and debug if inner
-	//type implements them
+	// TODO: Find a way to implement display and debug if inner
+	// type implements them
+	// ... or just use the derive thing which results in a slightly different
+	// result... Might play around with it later.
 	/*
 	#[test]
 	fn display() {
