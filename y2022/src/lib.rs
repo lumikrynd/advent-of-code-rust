@@ -8,6 +8,7 @@ mod day3;
 mod day4;
 mod day5;
 mod day6;
+mod day7;
 
 pub fn solve_day(day: Option<String>) -> Result<String, Box<dyn Error>> {
 	let day = parse_day(day)?;
@@ -26,6 +27,7 @@ fn get_solver(day: u8, input: &str) -> Result<Box<dyn PuzzleSolver>, Box<dyn Err
 		4 => day4::Solver::new(input),
 		5 => day5::Solver::new(input),
 		6 => day6::Solver::new(input),
+		7 => day7::Solver::new(input),
 		x => Err(AocError::new(&format!("No solver for day {x}")))?,
 	};
 	Ok(solver)
