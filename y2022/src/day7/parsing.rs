@@ -1,11 +1,10 @@
 use super::*;
 
-pub fn parse(input: &str) -> Solver {
-	let lines = input.lines().map(parse_line).collect();
-	Solver(lines)
+pub fn parse<'a>(input: &'a str) -> Vec<CliLine<'a>> {
+	input.lines().map(parse_line).collect()
 }
 
-fn parse_line(line: &str) -> CliLine {
+fn parse_line<'a>(line: &'a str) -> CliLine<'a> {
 	if line.starts_with("$ ") {
 		let command = parse_command(&line[2..]);
 		CliLine::Command(command)
@@ -15,11 +14,9 @@ fn parse_line(line: &str) -> CliLine {
 	}
 }
 
-fn parse_output(line: &str) -> LsOutput {
+fn parse_output<'a>(line: &'a str) -> LsOutput<'a> {
 	if line.starts_with("dir ") {
-		LsOutput::Dir {
-			name: line[4..].to_string(),
-		}
+		LsOutput::Dir { name: &line[4..] }
 	} else {
 		let words = line.split_whitespace().collect::<Vec<&str>>();
 		let [size, name] = words[..] else {
@@ -27,13 +24,13 @@ fn parse_output(line: &str) -> LsOutput {
 		};
 
 		LsOutput::File {
-			name: name.to_string(),
+			name: name,
 			size: size.parse().unwrap(),
 		}
 	}
 }
 
-fn parse_command(command: &str) -> Command {
+fn parse_command<'a>(command: &'a str) -> Command<'a> {
 	match &command[..2] {
 		"ls" => Command::Ls,
 		"cd" => Command::Cd(parse_dir(&command[3..])),
@@ -41,13 +38,11 @@ fn parse_command(command: &str) -> Command {
 	}
 }
 
-fn parse_dir(dir: &str) -> Cd {
+fn parse_dir<'a>(dir: &'a str) -> Cd<'a> {
 	match dir {
 		"/" => Cd::Root,
 		".." => Cd::Parent,
-		x => Cd::Dir {
-			name: x.to_string(),
-		},
+		x => Cd::Dir { name: x },
 	}
 }
 
@@ -61,7 +56,7 @@ mod test {
 		let result = parse_line(line);
 
 		let expected = CliLine::Output(LsOutput::File {
-			name: "file_name".to_string(),
+			name: "file_name",
 			size: 654152,
 		});
 		assert_eq!(result, expected);
@@ -72,9 +67,7 @@ mod test {
 		let line = "dir dir_name";
 		let result = parse_line(line);
 
-		let expected = CliLine::Output(LsOutput::Dir {
-			name: "dir_name".to_string(),
-		});
+		let expected = CliLine::Output(LsOutput::Dir { name: "dir_name" });
 		assert_eq!(result, expected);
 	}
 
@@ -107,9 +100,7 @@ mod test {
 		let line = "$ cd a_folder";
 		let result = parse_line(line);
 
-		let expected = CliLine::Command(Command::Cd(Cd::Dir {
-			name: "a_folder".to_string(),
-		}));
+		let expected = CliLine::Command(Command::Cd(Cd::Dir { name: "a_folder" }));
 
 		assert_eq!(result, expected);
 	}

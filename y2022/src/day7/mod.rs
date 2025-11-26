@@ -1,10 +1,12 @@
-use aoc_helpers::{PuzzleSolver, errors::AocError, wrapper};
+use aoc_helpers::PuzzleSolver;
 
 mod parsing;
 
-pub struct Solver(Vec<CliLine>);
+pub struct Solver<'a> {
+	cli_lines: Vec<CliLine<'a>>,
+}
 
-impl PuzzleSolver for Solver {
+impl<'a> PuzzleSolver for Solver<'a> {
 	fn solve_part_1(&self) -> Option<String> {
 		None
 	}
@@ -14,36 +16,38 @@ impl PuzzleSolver for Solver {
 	}
 }
 
-#[derive(Debug, PartialEq)]
-enum CliLine {
-	Output(LsOutput),
-	Command(Command),
+impl<'a> Solver<'a> {
+	pub fn new(input: &'a str) -> Box<Solver<'a>> {
+		let s = Solver {
+			cli_lines: parsing::parse(input),
+		};
+		Box::new(s)
+	}
 }
 
 #[derive(Debug, PartialEq)]
-enum LsOutput {
-	Dir { name: String },
-	File { name: String, size: usize },
+enum CliLine<'a> {
+	Output(LsOutput<'a>),
+	Command(Command<'a>),
 }
 
 #[derive(Debug, PartialEq)]
-enum Command {
-	Cd(Cd),
+enum LsOutput<'a> {
+	Dir { name: &'a str },
+	File { name: &'a str, size: usize },
+}
+
+#[derive(Debug, PartialEq)]
+enum Command<'a> {
+	Cd(Cd<'a>),
 	Ls,
 }
 
 #[derive(Debug, PartialEq)]
-enum Cd {
+enum Cd<'a> {
 	Root,
 	Parent,
-	Dir { name: String },
-}
-
-impl Solver {
-	pub fn new(input: &str) -> Box<Solver> {
-		let solver = parsing::parse(input);
-		Box::new(solver)
-	}
+	Dir { name: &'a str },
 }
 
 #[cfg(test)]

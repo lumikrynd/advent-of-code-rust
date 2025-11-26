@@ -19,7 +19,7 @@ pub fn solve_day(day: Option<String>) -> Result<String, Box<dyn Error>> {
 	Ok(solution)
 }
 
-fn get_solver(day: u8, input: &str) -> Result<Box<dyn PuzzleSolver>, Box<dyn Error>> {
+fn get_solver<'a>(day: u8, input: &'a str) -> Result<Box<dyn PuzzleSolver + 'a>, Box<dyn Error>> {
 	let solver: Box<dyn PuzzleSolver> = match day {
 		1 => day1::Solver::new(input),
 		2 => day2::Solver::new(input),

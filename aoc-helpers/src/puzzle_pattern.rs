@@ -12,7 +12,7 @@ fn fallback(item: Option<String>) -> String {
 	item.unwrap_or("Not implemented".to_string())
 }
 
-impl dyn PuzzleSolver {
+impl<'a> dyn PuzzleSolver + 'a {
 	pub fn solve(&self) -> String {
 		let part_1 = fallback(self.solve_part_1());
 		let part_2 = fallback(self.solve_part_2());
