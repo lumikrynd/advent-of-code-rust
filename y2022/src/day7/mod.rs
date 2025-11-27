@@ -29,11 +29,10 @@ impl<'a> PuzzleSolver for Solver<'a> {
 		let missing = required - free;
 
 		let mut sorted = fs.get_all_dirs(vec![]);
-		sorted.sort_by(|a, b| a.get_size().cmp(&b.get_size()));
+		sorted.sort_by_key(|a| a.get_size());
 		let smallest = sorted
 			.iter()
-			.filter(|d| d.get_size() >= missing)
-			.next()
+			.find(|d| d.get_size() >= missing)
 			.expect("Should have one");
 
 		Some(smallest.get_size().to_string())
@@ -93,7 +92,7 @@ where
 		}
 	}
 
-	return content;
+	content
 }
 
 // File system item. Either a file or a directory.
@@ -123,7 +122,7 @@ impl<'a> FsItem<'a> {
 		match self {
 			FsItem::File { .. } => intermediate,
 			FsItem::Dir { content, .. } => {
-				intermediate.push(&self);
+				intermediate.push(self);
 				content
 					.values()
 					.fold(intermediate, |acc, v| v.get_all_dirs(acc))

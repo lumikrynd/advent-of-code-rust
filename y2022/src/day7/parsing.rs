@@ -5,8 +5,8 @@ pub fn parse<'a>(input: &'a str) -> Vec<CliLine<'a>> {
 }
 
 fn parse_line<'a>(line: &'a str) -> CliLine<'a> {
-	if line.starts_with("$ ") {
-		let command = parse_command(&line[2..]);
+	if let Some(rest) = line.strip_prefix("$ ") {
+		let command = parse_command(rest);
 		CliLine::Command(command)
 	} else {
 		let output = parse_output(line);
@@ -15,18 +15,16 @@ fn parse_line<'a>(line: &'a str) -> CliLine<'a> {
 }
 
 fn parse_output<'a>(line: &'a str) -> LsOutput<'a> {
-	if line.starts_with("dir ") {
-		LsOutput::Dir { name: &line[4..] }
+	if let Some(name) = line.strip_prefix("dir ") {
+		LsOutput::Dir { name }
 	} else {
 		let words = line.split_whitespace().collect::<Vec<&str>>();
 		let [size, name] = words[..] else {
 			panic!();
 		};
 
-		LsOutput::File {
-			name: name,
-			size: size.parse().unwrap(),
-		}
+		let size = size.parse().unwrap();
+		LsOutput::File { name, size }
 	}
 }
 
@@ -100,7 +98,8 @@ mod test {
 		let line = "$ cd a_folder";
 		let result = parse_line(line);
 
-		let expected = CliLine::Command(Command::Cd(Cd::Dir { name: "a_folder" }));
+		let name = "a_folder";
+		let expected = CliLine::Command(Command::Cd(Cd::Dir { name }));
 
 		assert_eq!(result, expected);
 	}
