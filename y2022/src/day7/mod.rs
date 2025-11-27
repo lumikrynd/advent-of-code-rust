@@ -22,7 +22,21 @@ impl<'a> PuzzleSolver for Solver<'a> {
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let fs = self.to_dir_structure();
+		let total = 70000000;
+		let required = 30000000;
+		let free = total - fs.get_size();
+		let missing = required - free;
+
+		let mut sorted = fs.get_all_dirs(vec![]);
+		sorted.sort_by(|a, b| a.get_size().cmp(&b.get_size()));
+		let smallest = sorted
+			.iter()
+			.filter(|d| d.get_size() >= missing)
+			.next()
+			.expect("Should have one");
+
+		Some(smallest.get_size().to_string())
 	}
 }
 
@@ -82,6 +96,7 @@ where
 	return content;
 }
 
+// File system item. Either a file or a directory.
 #[derive(Debug, PartialEq)]
 enum FsItem<'a> {
 	File {
@@ -116,6 +131,7 @@ impl<'a> FsItem<'a> {
 		}
 	}
 
+	/// Space used up by the file-system item
 	fn get_size(&self) -> usize {
 		match self {
 			FsItem::File { size, .. } => *size,
