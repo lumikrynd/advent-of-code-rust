@@ -1,54 +1,35 @@
 pub struct Map {
-	content: Vec<u8>,
-	columns: usize,
-	rows: usize,
+	content: Vec<Vec<u8>>,
 }
 
 impl Map {
 	pub fn new(input: &str) -> Map {
-		let mut lines = input.lines();
-		let first = lines.next().expect("Empty input");
-		let mut map = Self::init(first);
-
-		for row in lines {
-			map.add_row(row);
-		}
+		let content = input.lines().map(to_vec).collect();
+		let map = Map { content };
+		map.panic_if_invalid();
 
 		map
 	}
 
 	pub fn get(&self, x: usize, y: usize) -> &u8 {
-		let i = (y*self.columns) + x;
-		&self.content[i]
+		&self.content[y][x]
 	}
 
-	fn init(first_line: &str) -> Map {
-		let mut map = Map {
-			content: vec![],
-			columns: first_line.chars().count(),
-			rows: 0,
-		};
+	fn panic_if_invalid(&self) {
+		let row_length = self.content[0].len();
 
-		map.add_row(first_line);
-		map
-	}
-
-	fn add_row(&mut self, row: &str){
-		if row.chars().count() != self.columns {
-			panic!("Badly formed input")
-		}
-
-		self.rows += 1;
-
-		for c in row.chars() {
-			let digit = Self::to_digit(c);
-			self.content.push(digit);
+		if self.content.iter().any(|r| r.len() != row_length) {
+			panic!("Map isn't properly rectangular")
 		}
 	}
+}
 
-	fn to_digit(c: char) -> u8 {
-		c.to_digit(10).unwrap().try_into().unwrap()
-	}
+fn to_vec(line: &str) -> Vec<u8> {
+	line.chars().map(to_digit).collect()
+}
+
+fn to_digit(c: char) -> u8 {
+	c.to_digit(10).unwrap().try_into().unwrap()
 }
 
 #[cfg(test)]
