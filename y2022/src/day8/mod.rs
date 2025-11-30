@@ -1,4 +1,4 @@
-use aoc_helpers::PuzzleSolver;
+use aoc_helpers::{PuzzleSolver, cartesian_set};
 
 mod map;
 use map::*;
@@ -11,14 +11,9 @@ impl PuzzleSolver for Solver {
 	fn solve_part_1(&self) -> Option<String> {
 		let (x_size, y_size) = self.map.get_dimmensions();
 
-		let mut visible = 0;
-		for x in 0..x_size {
-			for y in 0..y_size {
-				if is_vissible(&self.map, x, y) {
-					visible += 1;
-				}
-			}
-		}
+		let visible = cartesian_set(0..x_size, 0..y_size)
+			.filter(|(x, y)| is_vissible(&self.map, *x, *y))
+			.count();
 
 		Some(visible.to_string())
 	}
@@ -54,8 +49,7 @@ fn is_vissible(map: &Map, x: usize, y: usize) -> bool {
 
 // xs for x_start, xe for end
 fn max_in_area(map: &Map, xs: usize, xe: usize, ys: usize, ye: usize) -> i16 {
-	(xs..=xe)
-		.flat_map(move |x| (ys..=ye).map(move |y| (x, y)))
+	cartesian_set(xs..=xe, ys..=ye)
 		.map(|(x, y)| map.get(x, y).into())
 		.max()
 		.unwrap_or(-1)
