@@ -11,8 +11,15 @@ impl Map {
 		map
 	}
 
-	pub fn get(&self, x: usize, y: usize) -> &u8 {
-		&self.content[y][x]
+	pub fn get(&self, x: usize, y: usize) -> u8 {
+		self.content[y][x]
+	}
+
+	pub fn get_dimmensions(&self) -> (usize, usize) {
+		let x_len = self.content[0].len();
+		let y_len = self.content.len();
+
+		return (x_len, y_len);
 	}
 
 	fn panic_if_invalid(&self) {
@@ -46,10 +53,10 @@ mod test {
 
 		let map = Map::new(input);
 
-		assert_eq!(7, *map.get(3, 1));
-		assert_eq!(8, *map.get(0, 2));
-		assert_eq!(0, *map.get(0, 0));
-		assert_eq!(0, *map.get(3, 2));
+		assert_eq!(7, map.get(3, 1));
+		assert_eq!(8, map.get(0, 2));
+		assert_eq!(0, map.get(0, 0));
+		assert_eq!(0, map.get(3, 2));
 	}
 
 	#[test]
