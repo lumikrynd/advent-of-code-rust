@@ -54,7 +54,12 @@ impl State {
 		State { stacks }
 	}
 
-	fn move_crates(&mut self, from: u8, to: u8, count: u8) -> Result<(), AocError> {
+	fn move_crates(
+		&mut self,
+		from: u8,
+		to: u8,
+		count: u8,
+	) -> Result<(), AocError> {
 		let from = (from - 1) as usize;
 		let to = (to - 1) as usize;
 		let count = count as usize;

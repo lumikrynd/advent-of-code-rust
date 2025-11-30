@@ -14,14 +14,15 @@ where
 mod test {
 	use std::cell::RefCell;
 
-use super::*;
+	use super::*;
 
 	#[test]
 	fn int_iter_test() {
 		let a = vec![1, 2, 3];
 		let b = vec![4, 5];
 
-		let combined: Vec<_> = cartesian_set(a.into_iter(), b.into_iter()).collect();
+		let combined: Vec<_> =
+			cartesian_set(a.into_iter(), b.into_iter()).collect();
 
 		let expected = vec![
 			(1, 4),

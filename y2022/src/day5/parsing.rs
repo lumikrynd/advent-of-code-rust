@@ -20,7 +20,8 @@ fn parse_stacks(stacks: &Vec<&str>) -> Result<Vec<Stack>, Box<dyn Error>> {
 	let mut stacks = stacks.iter().rev();
 	let def = stacks.next().ok_or(AocError::new("no definition line"))?;
 
-	let vectors = stacks.fold(initialize_stacks(def), |acc, val| insert_boxes(acc, val));
+	let vectors =
+		stacks.fold(initialize_stacks(def), |acc, val| insert_boxes(acc, val));
 
 	Ok(vectors)
 }
@@ -52,7 +53,9 @@ fn parse_moves(moves: &Vec<&str>) -> Result<Vec<Move>, Box<dyn Error>> {
 fn parse_move(m: &str) -> Result<Move, Box<dyn Error>> {
 	let parts: Vec<_> = m.split(' ').collect();
 	let ["move", count, "from", from, "to", to] = parts[..] else {
-		return Err(AocError::boxed(&format!("Didn't match move pattern:\n{m}")));
+		return Err(AocError::boxed(&format!(
+			"Didn't match move pattern:\n{m}"
+		)));
 	};
 
 	let res = Move::new(from.parse()?, to.parse()?, count.parse()?);
@@ -61,7 +64,6 @@ fn parse_move(m: &str) -> Result<Move, Box<dyn Error>> {
 
 #[cfg(test)]
 mod test {
-	use std::result;
 
 	use super::*;
 

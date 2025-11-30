@@ -19,7 +19,7 @@ impl Map {
 		let x_len = self.content[0].len();
 		let y_len = self.content.len();
 
-		return (x_len, y_len);
+		(x_len, y_len)
 	}
 
 	fn panic_if_invalid(&self) {

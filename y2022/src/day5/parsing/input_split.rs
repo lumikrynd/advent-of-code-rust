@@ -63,10 +63,13 @@ mod test {
 		let not_empty = |s: &&str| !s.trim().is_empty();
 		let transform = Split::insert_if_else_next_pred(not_empty);
 
-		let result = input.lines().fold(Split::<&str>::new(), transform).unpack();
+		let result =
+			input.lines().fold(Split::<&str>::new(), transform).unpack();
 		let mut r = result.iter();
 
-		let (Some(a), Some(b), Some(c), None) = (r.next(), r.next(), r.next(), r.next()) else {
+		let (Some(a), Some(b), Some(c), None) =
+			(r.next(), r.next(), r.next(), r.next())
+		else {
 			panic!("Whoops");
 		};
 		assert_eq!(*a, vec!["a", "b"]);
