@@ -1,10 +1,11 @@
 use std::{error::Error, fmt, num::ParseIntError, str::FromStr};
 
-use super::moves::{Direction, Move};
+use super::moves::{Direction, Move, Moves};
 
-pub fn parse(input: &str) -> Vec<Move> {
+pub fn parse(input: &str) -> Moves {
 	let moves: Result<_, _> = input.lines().map(|l| l.parse()).collect();
-	moves.expect("Invalid moves")
+	let moves = moves.expect("Invalid moves");
+	Moves(moves)
 }
 
 impl FromStr for Move {
@@ -83,7 +84,7 @@ mod test {
 			Move(Direction::Left, 42),
 			Move(Direction::Down, 1),
 		];
-		assert_eq!(result, expected);
+		assert_eq!(result.0, expected);
 	}
 
 	#[allow(nonstandard_style)]

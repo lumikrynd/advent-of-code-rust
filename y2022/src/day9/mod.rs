@@ -12,31 +12,38 @@ pub struct Solver {
 
 impl PuzzleSolver for Solver {
 	fn solve_part_1(&self) -> Option<String> {
-		let iter = self.moves.move_iter();
+		let moves = &self.moves;
+		let count = count_tail_locations(moves, 1);
+		Some(count.to_string())
+	}
 
-		let fun_times = iter.fold(vec![Rope::new()], |mut coll, dir| {
+	fn solve_part_2(&self) -> Option<String> {
+		let moves = &self.moves;
+		let count = count_tail_locations(moves, 9);
+		Some(count.to_string())
+	}
+}
+
+fn count_tail_locations(moves: &Moves, rope_tail_length: usize) -> usize {
+	let iter = moves.move_iter();
+
+	let rope_states =
+		iter.fold(vec![Rope::new(rope_tail_length)], |mut coll, dir| {
 			let last = coll.last().unwrap();
 			let next = last.move_direction(dir);
 			coll.push(next);
 			coll
 		});
 
-		let tail_locations: HashSet<_> =
-			fun_times.into_iter().map(|r| r.tail).collect();
-		let count = tail_locations.len();
+	let tail_locations: HashSet<Position> =
+		rope_states.into_iter().map(|r| r.tail()).collect();
 
-		Some(count.to_string())
-	}
-
-	fn solve_part_2(&self) -> Option<String> {
-		None
-	}
+	tail_locations.iter().count()
 }
 
 impl Solver {
 	pub fn new(input: &str) -> Box<Solver> {
 		let moves = parsing::parse(input);
-		let moves = Moves(moves);
 		let s = Solver { moves };
 		Box::new(s)
 	}
@@ -45,21 +52,35 @@ impl Solver {
 #[derive(Debug, PartialEq)]
 struct Rope {
 	head: Position,
-	tail: Position,
+	tail: Vec<Position>,
 }
 
 impl Rope {
-	fn new() -> Rope {
+	fn new(tail_len: usize) -> Rope {
 		Rope {
 			head: Position(0, 0),
-			tail: Position(0, 0),
+			tail: vec![Position(0, 0); tail_len],
 		}
 	}
 
 	fn move_direction(&self, dir: Direction) -> Self {
 		let head = self.head.move_direction(dir);
-		let tail = self.tail.move_towards(head);
+
+		let mut prev = head;
+		let tail = self.tail.iter().fold(vec![], move |mut acc, val| {
+			let next = val.move_towards(prev);
+			prev = next;
+			acc.push(next);
+			acc
+		});
 		Self { head, tail }
+	}
+
+	pub fn tail(&self) -> Position {
+		match self.tail.last() {
+			Some(t) => *t,
+			None => self.head,
+		}
 	}
 }
 
@@ -91,7 +112,72 @@ impl Position {
 #[cfg(test)]
 mod test {
 	use super::Direction::*;
+	use super::parsing::parse;
 	use super::*;
+
+	use indoc::indoc;
+
+	#[test]
+	fn count_tail_locations_1() {
+		let input = indoc! {"
+			R 4
+			U 4
+			L 3
+			D 1
+			R 4
+			D 1
+			L 5
+			R 2"};
+		let moves = parse(input);
+
+		let result = count_tail_locations(&moves, 1);
+		assert_eq!(13, result);
+	}
+
+	#[test]
+	fn count_tail_locations_2() {
+		let input = indoc! {"
+			R 5
+			U 8
+			L 8
+			D 3
+			R 17
+			D 10
+			L 25
+			U 20"};
+		let moves = parse(input);
+
+		let result = count_tail_locations(&moves, 9);
+		assert_eq!(36, result);
+	}
+
+	#[test]
+	fn long_rope_move() {
+		let mut rope = Rope::new(2);
+		rope = rope.move_direction(Right);
+		rope = rope.move_direction(Right);
+		rope = rope.move_direction(Right);
+
+		assert_eq!(
+			rope,
+			long_rope(vec![
+				Position(3, 0),
+				Position(2, 0),
+				Position(1, 0)
+			])
+		);
+
+		rope = rope.move_direction(Up);
+		rope = rope.move_direction(Up);
+		assert_eq!(
+			rope,
+			long_rope(vec![
+				Position(3, 2),
+				Position(3, 1),
+				Position(2, 1)
+			])
+		);
+	}
 
 	#[test]
 	fn rope_move() {
@@ -131,6 +217,12 @@ mod test {
 	fn position_towards() {}
 
 	fn rope(head: Position, tail: Position) -> Rope {
+		let tail = vec![tail];
 		Rope { head, tail }
+	}
+
+	fn long_rope(mut knots: Vec<Position>) -> Rope {
+		let head = knots.remove(0);
+		Rope { head, tail: knots }
 	}
 }
