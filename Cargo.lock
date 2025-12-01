@@ -517,6 +517,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "runner"
+version = "0.1.0"
+dependencies = [
+ "y2022",
+ "y2025",
+]
+
+[[package]]
 name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -956,6 +964,13 @@ version = "0.1.0"
 dependencies = [
  "aoc-helpers",
  "indoc",
+]
+
+[[package]]
+name = "y2025"
+version = "0.1.0"
+dependencies = [
+ "aoc-helpers",
 ]
 
 [[package]]

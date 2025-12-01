@@ -1,0 +1,8 @@
+[package]
+name = "runner"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+y2022 = { version = "0.1.0", path = "../y2022" }
+y2025 = { version = "0.1.0", path = "../y2025" }

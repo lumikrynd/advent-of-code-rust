@@ -3,8 +3,6 @@ mod web_fetcher;
 use std::error::Error;
 use std::fs;
 
-use crate::errors::AocError;
-
 pub struct Date {
 	day: u8,
 	year: u16,
@@ -14,14 +12,6 @@ impl Date {
 	pub fn new(day: u8, year: u16) -> Self {
 		Date { day, year }
 	}
-}
-
-pub fn parse_day(day: Option<String>) -> Result<u8, Box<dyn Error + 'static>> {
-	let day_string = day.ok_or(AocError::new("Need to set day"))?;
-	let day: u8 = day_string
-		.parse()
-		.map_err(|e| AocError::from_err("Failed parsing day:", e))?;
-	Ok(day)
 }
 
 pub fn get_puzzle_input(date: &Date) -> Result<String, Box<dyn Error>> {
