@@ -971,6 +971,7 @@ name = "y2025"
 version = "0.1.0"
 dependencies = [
  "aoc-helpers",
+ "indoc",
 ]
 
 [[package]]

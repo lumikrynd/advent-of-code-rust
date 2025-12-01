@@ -2,6 +2,8 @@ use aoc_helpers::errors::AocError;
 use aoc_helpers::PuzzleSolver;
 use std::error::Error;
 
+mod day1;
+
 pub fn solve_day(
 	mut arguments: impl Iterator<Item = String>,
 ) -> Result<String, Box<dyn Error>> {
@@ -19,6 +21,7 @@ fn get_solver<'a>(
 	input: &'a str,
 ) -> Result<Box<dyn PuzzleSolver + 'a>, Box<dyn Error>> {
 	let solver: Box<dyn PuzzleSolver> = match day {
+		1 => day1::Solver::new(input),
 		x => Err(AocError::new(&format!("No solver for day {x}")))?,
 	};
 	Ok(solver)
