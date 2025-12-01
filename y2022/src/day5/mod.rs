@@ -87,7 +87,7 @@ impl State {
 wrapper!(Stack, Vec<char>, Debug);
 
 #[derive(Debug, PartialEq)]
-pub struct Move {
+struct Move {
 	from: u8,
 	to: u8,
 	count: u8,

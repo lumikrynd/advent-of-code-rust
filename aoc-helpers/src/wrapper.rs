@@ -6,10 +6,24 @@
 #[macro_export]
 macro_rules! wrapper {
 	($i:ident, $t:ty $(, $item:ident) *) => {
-
 		#[derive(PartialEq, Clone $(, $item)*)]
 		struct $i($t);
+		$crate::wrapper_inner!($i, $t);
+	};
+}
 
+#[macro_export]
+macro_rules! pub_wrapper {
+	($i:ident, $t:ty $(, $item:ident) *) => {
+		#[derive(PartialEq, Clone $(, $item)*)]
+		pub struct $i(pub $t);
+		$crate::wrapper_inner!($i, $t);
+	};
+}
+
+#[macro_export]
+macro_rules! wrapper_inner {
+	($i:ident, $t:ty $(, $item:ident) *) => {
 		impl std::ops::Deref for $i {
 			type Target = $t;
 

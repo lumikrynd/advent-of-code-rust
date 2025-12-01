@@ -1,6 +1,6 @@
 use std::{error::Error, fmt, num::ParseIntError, str::FromStr};
 
-use super::{Direction, Move};
+use super::moves::{Direction, Move};
 
 pub fn parse(input: &str) -> Vec<Move> {
 	let moves: Result<_, _> = input.lines().map(|l| l.parse()).collect();
@@ -24,7 +24,7 @@ impl FromStr for Move {
 		};
 
 		let steps = steps.parse().map_err(|e| ParseError::IntError(e))?;
-		let m = Move { direction, steps };
+		let m = Move::new(direction, steps);
 		Ok(m)
 	}
 }
@@ -64,6 +64,7 @@ impl fmt::Display for ParseError {
 #[cfg(test)]
 mod test {
 	use super::*;
+	use super::super::moves::*;
 	use indoc::indoc;
 
 	#[test]
@@ -87,6 +88,6 @@ mod test {
 
 	#[allow(nonstandard_style)]
 	fn Move(direction: Direction, steps: usize) -> Move {
-		Move { direction, steps }
+		Move::new(direction, steps)
 	}
 }
