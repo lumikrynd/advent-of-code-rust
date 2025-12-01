@@ -37,10 +37,7 @@ impl<'a> Iterator for MovesIter<'a> {
 
 	fn next(&mut self) -> Option<Self::Item> {
 		if self.count == 0 {
-			let Some(Move { direction, steps }) = self.inner.next() else {
-				return None;
-			};
-
+			let Move { direction, steps } = self.inner.next()?;
 			self.current = Some(*direction);
 			self.count = *steps;
 		}

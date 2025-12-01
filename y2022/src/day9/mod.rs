@@ -38,7 +38,7 @@ fn count_tail_locations(moves: &Moves, rope_tail_length: usize) -> usize {
 	let tail_locations: HashSet<Position> =
 		rope_states.into_iter().map(|r| r.tail()).collect();
 
-	tail_locations.iter().count()
+	tail_locations.len()
 }
 
 impl Solver {

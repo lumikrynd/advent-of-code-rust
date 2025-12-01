@@ -24,7 +24,7 @@ impl FromStr for Move {
 			x => Err(ParseError::DirectionError(x.to_string()))?,
 		};
 
-		let steps = steps.parse().map_err(|e| ParseError::IntError(e))?;
+		let steps = steps.parse().map_err(ParseError::IntError)?;
 		let m = Move::new(direction, steps);
 		Ok(m)
 	}
