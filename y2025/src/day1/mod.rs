@@ -23,7 +23,9 @@ impl PuzzleSolver for Solver {
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let dial = dial::new(50);
+		let result = super_secret_password_2(dial, &self.rotations);
+		Some(result.to_string())
 	}
 }
 
@@ -37,6 +39,24 @@ fn super_secret_password(start_position: Dial, rotations: &Rotations) -> usize {
 		});
 
 	positions.iter().filter(|p| p.position() == 0).count()
+}
+
+fn super_secret_password_2(
+	start_position: Dial,
+	rotations: &Rotations,
+) -> usize {
+	let mut position = start_position;
+	rotations
+		.iter()
+		.flat_map(|r| r.to_single_step())
+		.fold(0, |acc, r| {
+			position = position.rotate(&r);
+			if position.position() == 0 {
+				acc + 1
+			} else {
+				acc
+			}
+		})
 }
 
 mod dial {
@@ -93,10 +113,14 @@ mod rotations {
 
 	pub type Rotations = Vec<Rotation>;
 
-	#[derive(Debug, PartialEq)]
+	#[derive(Clone, Debug, PartialEq)]
 	pub struct Rotation {
 		direction: Direction,
 		clicks: i16,
+	}
+
+	pub fn new(direction: Direction, clicks: i16) -> Rotation {
+		Rotation { direction, clicks }
 	}
 
 	impl Rotation {
@@ -107,10 +131,34 @@ mod rotations {
 		pub fn clicks(&self) -> i16 {
 			self.clicks
 		}
+
+		pub fn to_single_step(&self) -> RotationsInSingleStep {
+			RotationsInSingleStep {
+				direction: self.direction,
+				remaining: self.clicks,
+			}
+		}
 	}
 
-	pub fn new(direction: Direction, clicks: i16) -> Rotation {
-		Rotation { direction, clicks }
+	pub struct RotationsInSingleStep {
+		direction: Direction,
+		remaining: i16,
+	}
+
+	impl Iterator for RotationsInSingleStep {
+		type Item = Rotation;
+
+		fn next(&mut self) -> Option<Self::Item> {
+			if self.remaining <= 0 {
+				return None;
+			}
+
+			self.remaining -= 1;
+			Some(Self::Item {
+				direction: self.direction,
+				clicks: 1,
+			})
+		}
 	}
 
 	#[derive(Clone, Copy, Debug, PartialEq)]
@@ -146,6 +194,23 @@ mod test {
 
 		let result = solver.solve_part_1().unwrap();
 		assert_eq!(result, "3");
+
+		let result = solver.solve_part_2().unwrap();
+		assert_eq!(result, "6");
+	}
+
+	#[test]
+	fn single_step_rotation() {
+		let mut iter = rotation(Left, 3).to_single_step();
+
+		assert_eq!(rotation(Left, 1), iter.next().unwrap());
+		assert_eq!(rotation(Left, 1), iter.next().unwrap());
+		assert_eq!(rotation(Left, 1), iter.next().unwrap());
+		assert_eq!(None, iter.next());
+
+		let mut iter = rotation(Right, 1).to_single_step();
+		assert_eq!(rotation(Right, 1), iter.next().unwrap());
+		assert_eq!(None, iter.next());
 	}
 
 	#[test]
