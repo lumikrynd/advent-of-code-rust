@@ -37,7 +37,7 @@ mod test {
 		let input = "2-4,6-8\n2-3,4-5";
 		let result = parse(input);
 
-		let expected = vec![
+		let expected = [
 			(Range::new(2, 4), Range::new(6, 8)),
 			(Range::new(2, 3), Range::new(4, 5)),
 		];

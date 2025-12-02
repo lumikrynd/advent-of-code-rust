@@ -122,7 +122,7 @@ mod test {
 
 	#[test]
 	fn parse_works() {
-		let lines = vec!["cialke", "KaZk"];
+		let lines = ["cialke", "KaZk"];
 		let raw = lines.join("\n");
 
 		let result = Solver::new(&raw);
@@ -131,13 +131,13 @@ mod test {
 		are_equal(1, &result, &lines);
 	}
 
-	fn are_equal(index: usize, result: &Box<Solver>, lines: &Vec<&str>) {
+	fn are_equal(index: usize, result: &Solver, lines: &[&str]) {
 		assert_eq!(result.rucksacks[index].all(), char_arr(lines[index]));
 	}
 
 	#[test]
 	fn part_1_calculate_duplicate_value() {
-		let lines = vec!["AaZA", "jklFik"];
+		let lines = ["AaZA", "jklFik"];
 
 		let solver = Solver::new(&lines.join("\n"));
 
@@ -146,7 +146,7 @@ mod test {
 
 	#[test]
 	fn part_2_calculate_badge_value() {
-		let lines = vec![
+		let lines = [
 			"AaZA", "ZklFik", "LOLZ", "AaZA", "ZklFak", "LOLa",
 		];
 

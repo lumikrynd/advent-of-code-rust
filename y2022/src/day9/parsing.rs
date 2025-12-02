@@ -78,7 +78,7 @@ mod test {
 
 		let result = parse(input);
 
-		let expected = vec![
+		let expected = [
 			Move(Direction::Right, 4),
 			Move(Direction::Up, 4),
 			Move(Direction::Left, 42),

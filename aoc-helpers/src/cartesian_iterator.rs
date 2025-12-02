@@ -18,13 +18,13 @@ mod test {
 
 	#[test]
 	fn int_iter_test() {
-		let a = vec![1, 2, 3];
-		let b = vec![4, 5];
+		let a = [1, 2, 3];
+		let b = [4, 5];
 
 		let combined: Vec<_> =
 			cartesian_set(a.into_iter(), b.into_iter()).collect();
 
-		let expected = vec![
+		let expected = [
 			(1, 4),
 			(2, 4),
 			(3, 4),
@@ -38,12 +38,12 @@ mod test {
 
 	#[test]
 	fn borrow_iter_test() {
-		let a = vec![1, 2, 3];
-		let b = vec![4, 5];
+		let a = [1, 2, 3];
+		let b = [4, 5];
 
 		let combined: Vec<_> = cartesian_set(a.iter(), b.iter()).collect();
 
-		let expected = vec![
+		let expected = [
 			(&1, &4),
 			(&2, &4),
 			(&3, &4),
@@ -59,8 +59,8 @@ mod test {
 	/// resulting iterator isn't run through.
 	#[test]
 	fn is_procedural() {
-		let a = vec![1, 2, 3];
-		let b = vec![4, 5];
+		let a = [1, 2, 3];
+		let b = [4, 5];
 
 		let a_count = RefCell::new(0);
 		let b_count = RefCell::new(0);
@@ -68,11 +68,11 @@ mod test {
 		let mut iterator = cartesian_set(
 			a.iter().inspect(|_| {
 				let mut count = a_count.borrow_mut();
-				*count = *count + 1;
+				*count += 1;
 			}),
 			b.iter().inspect(|_| {
 				let mut count = b_count.borrow_mut();
-				*count = *count + 1;
+				*count += 1;
 			}),
 		);
 

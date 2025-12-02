@@ -145,30 +145,30 @@ mod test {
 	fn get_invalid_ids_test() {
 		let value = range(10, 23);
 		let result = get_invalid_ids(&value, 2);
-		assert_eq!(vec![11, 22], result);
+		assert_eq!(result, [11, 22]);
 
 		let value = range(100, 232);
 		let result = get_invalid_ids(&value, 3);
-		assert_eq!(vec![111, 222], result);
+		assert_eq!(result, [111, 222]);
 	}
 
 	#[test]
 	fn get_all_invalid_ids_test() {
 		let value = range(11, 22);
 		let result = get_all_invalid_ids(&value);
-		assert_eq!(HashSet::from([11, 22]), result);
+		assert_eq!(result, HashSet::from([11, 22]));
 
 		let value = range(95, 115);
 		let result = get_all_invalid_ids(&value);
-		assert_eq!(HashSet::from([99, 111]), result);
+		assert_eq!(result, HashSet::from([99, 111]));
 
 		let value = range(998, 1012);
 		let result = get_all_invalid_ids(&value);
-		assert_eq!(HashSet::from([999, 1010]), result);
+		assert_eq!(result, HashSet::from([999, 1010]));
 
 		let value = range(222220, 222224);
 		let result = get_all_invalid_ids(&value);
-		assert_eq!(HashSet::from([222222]), result);
+		assert_eq!(result, HashSet::from([222222]));
 	}
 
 	#[test]
@@ -177,12 +177,12 @@ mod test {
 
 		let result = parse(input);
 
-		let expected = vec![
+		let expected = [
 			range(11, 22),
 			range(1188511880, 1188511890),
 		];
 
-		assert_eq!(expected, result);
+		assert_eq!(result, expected);
 	}
 
 	fn range(start: Int, end: Int) -> Range {

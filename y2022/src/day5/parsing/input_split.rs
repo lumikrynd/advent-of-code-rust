@@ -72,8 +72,8 @@ mod test {
 		else {
 			panic!("Whoops");
 		};
-		assert_eq!(*a, vec!["a", "b"]);
-		assert_eq!(*b, vec!["c", "d", "e"]);
-		assert_eq!(*c, vec!["f"]);
+		assert_eq!(*a, ["a", "b"]);
+		assert_eq!(*b, ["c", "d", "e"]);
+		assert_eq!(*c, ["f"]);
 	}
 }

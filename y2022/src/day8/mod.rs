@@ -155,7 +155,7 @@ mod test {
 
 		let map = Map::new(input);
 
-		assert_eq!(false, is_vissible(&map, 1, 1));
+		assert!(!is_vissible(&map, 1, 1));
 	}
 
 	#[test]
@@ -167,7 +167,7 @@ mod test {
 
 		let map = Map::new(input);
 
-		assert_eq!(true, is_vissible(&map, 1, 1));
+		assert!(is_vissible(&map, 1, 1));
 	}
 
 	#[test]
@@ -179,7 +179,7 @@ mod test {
 
 		let map = Map::new(input);
 
-		assert_eq!(true, is_vissible(&map, 1, 1));
+		assert!(is_vissible(&map, 1, 1));
 	}
 
 	#[test]
@@ -191,7 +191,7 @@ mod test {
 
 		let map = Map::new(input);
 
-		assert_eq!(true, is_vissible(&map, 1, 1));
+		assert!(is_vissible(&map, 1, 1));
 	}
 
 	#[test]
@@ -203,6 +203,6 @@ mod test {
 
 		let map = Map::new(input);
 
-		assert_eq!(true, is_vissible(&map, 1, 1));
+		assert!(is_vissible(&map, 1, 1));
 	}
 }

@@ -16,7 +16,7 @@ pub fn parse(input: &str) -> Result<Solver, Box<dyn Error>> {
 	Ok(Solver { stacks, moves })
 }
 
-fn parse_stacks(stacks: &Vec<&str>) -> Result<Vec<Stack>, Box<dyn Error>> {
+fn parse_stacks(stacks: &[&str]) -> Result<Vec<Stack>, Box<dyn Error>> {
 	let mut stacks = stacks.iter().rev();
 	let def = stacks.next().ok_or(AocError::new("no definition line"))?;
 
@@ -46,7 +46,7 @@ fn initialize_stacks(def: &str) -> Vec<Stack> {
 	stacks
 }
 
-fn parse_moves(moves: &Vec<&str>) -> Result<Vec<Move>, Box<dyn Error>> {
+fn parse_moves(moves: &[&str]) -> Result<Vec<Move>, Box<dyn Error>> {
 	moves.iter().map(|k| parse_move(k)).collect()
 }
 
@@ -69,20 +69,20 @@ mod test {
 
 	#[test]
 	fn parse_move_test() {
-		let moves = vec![
+		let moves = [
 			"move 1 from 2 to 3",
 			"move 5 from 3 to 1",
 		];
 		let moves = parse_moves(&moves).unwrap();
 
-		let expected = vec![Move::new(2, 3, 1), Move::new(3, 1, 5)];
+		let expected = [Move::new(2, 3, 1), Move::new(3, 1, 5)];
 
 		assert_eq!(moves, expected);
 	}
 
 	#[test]
 	fn parse_stacks_test() -> Result<(), Box<dyn Error>> {
-		let input = vec![
+		let input = [
 			"    [D]    ",
 			"[N] [C]    ",
 			"[Z] [M] [P]",
@@ -91,7 +91,7 @@ mod test {
 
 		let result = parse_stacks(&input)?;
 
-		let expected = vec![
+		let expected = [
 			Stack(vec!['Z', 'N']),
 			Stack(vec!['M', 'C', 'D']),
 			Stack(vec!['P']),
@@ -115,7 +115,7 @@ mod test {
 
 		let Solver { stacks, moves } = parse(&input).unwrap();
 
-		let expected = vec![
+		let expected = [
 			Stack(vec!['Z', 'N']),
 			Stack(vec!['M', 'C', 'D']),
 			Stack(vec!['P']),
@@ -123,7 +123,7 @@ mod test {
 
 		assert_eq!(stacks, expected);
 
-		let expected = vec![Move::new(2, 3, 1), Move::new(3, 1, 5)];
+		let expected = [Move::new(2, 3, 1), Move::new(3, 1, 5)];
 
 		assert_eq!(moves, expected);
 	}

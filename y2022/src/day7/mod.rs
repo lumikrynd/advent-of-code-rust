@@ -210,7 +210,7 @@ mod test {
 
 	#[test]
 	fn get_dir_content_test() {
-		let input = vec![
+		let input = [
 			cmd_ls(),
 			out_file("a", 3),
 			out_dir("subdir"),
@@ -329,7 +329,7 @@ mod fs_item_tests {
 			.map(|f| f.name())
 			.collect();
 
-		let expected = vec![dir2_name, dir1_name];
+		let expected = [dir2_name, dir1_name];
 		assert_eq!(dir_names, expected);
 	}
 

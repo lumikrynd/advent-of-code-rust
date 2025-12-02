@@ -222,7 +222,7 @@ mod test {
 
 		let result = rotations::parse(input);
 
-		let expected = vec![
+		let expected = [
 			rotation(Left, 68),
 			rotation(Right, 42),
 			rotation(Left, 30),

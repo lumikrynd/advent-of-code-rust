@@ -61,14 +61,14 @@ mod test {
 	fn empty_in_empty_out() {
 		let input = "";
 		let result = parse(input);
-		assert_eq!(result, Vec::new());
+		assert_eq!(result, []);
 	}
 
 	#[test]
 	fn single_food_item() {
 		let input = "1000";
 		let result = parse(input);
-		let expected = vec![Elf::new(vec![1000])];
+		let expected = [Elf::new(vec![1000])];
 		assert_eq!(result, expected);
 	}
 
@@ -77,7 +77,7 @@ mod test {
 		let input = "1000\n\n4000\n\n2000";
 		let result = parse(input);
 
-		let expected = vec![
+		let expected = [
 			Elf::new(vec![1000]),
 			Elf::new(vec![4000]),
 			Elf::new(vec![2000]),
@@ -99,7 +99,7 @@ mod test {
 		let input = "1000\n\n4000\n3000\n\n2000";
 		let result = parse(input);
 
-		let expected = vec![
+		let expected = [
 			Elf::new(vec![1000]),
 			Elf::new(vec![4000, 3000]),
 			Elf::new(vec![2000]),

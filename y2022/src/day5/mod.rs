@@ -49,8 +49,8 @@ pub struct State {
 }
 
 impl State {
-	fn new(start: &Vec<Stack>) -> Self {
-		let stacks = (*start).clone();
+	fn new(start: &[Stack]) -> Self {
+		let stacks = Vec::from(start);
 		State { stacks }
 	}
 
@@ -106,7 +106,7 @@ mod test {
 
 	#[test]
 	fn move_crates_test() -> Result<(), Box<dyn Error>> {
-		let input = vec![
+		let input = [
 			Stack(vec!['A', 'B', 'C', 'D', 'E']),
 			Stack(vec!['F', 'G', 'H', 'I', 'J']),
 		];

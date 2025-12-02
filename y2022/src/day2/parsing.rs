@@ -38,7 +38,7 @@ mod test {
 		let input = "A Y\nB X\nC Z";
 		let result = parse(input);
 
-		let expected = vec![
+		let expected = [
 			Strategy::new(Move::Rock, Response::Y),
 			Strategy::new(Move::Paper, Response::X),
 			Strategy::new(Move::Scissors, Response::Z),
