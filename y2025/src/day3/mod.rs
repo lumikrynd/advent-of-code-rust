@@ -1,6 +1,7 @@
 use aoc_helpers::PuzzleSolver;
 
 type Digit = u8;
+type Voltage = u64;
 
 pub struct Solver {
 	batteries: Vec<Vec<Digit>>,
@@ -15,26 +16,39 @@ impl Solver {
 
 impl PuzzleSolver for Solver {
 	fn solve_part_1(&self) -> Option<String> {
-		let result: u32 = self
-			.batteries
-			.iter()
-			.map(|battery| best_battery_config(battery) as u32)
-			.sum();
-
+		let result = fun_name(&self.batteries, 2);
 		Some(result.to_string())
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let result = fun_name(&self.batteries, 12);
+		Some(result.to_string())
 	}
 }
 
-fn best_battery_config(battery: &[Digit]) -> u8 {
+fn fun_name(batteries: &Vec<Vec<Digit>>, count: usize) -> Voltage {
+	batteries
+		.iter()
+		.map(|battery| best_battery_config(battery, count) as Voltage)
+		.sum()
+}
+
+fn best_battery_config(battery: &[Digit], count: usize) -> Voltage {
 	let len = battery.len();
-	let first_digit = battery[..(len - 1)].iter().max().unwrap();
-	let first_index = battery.iter().position(|x| x == first_digit).unwrap();
-	let second_digit = battery[(first_index+1)..].iter().max().unwrap();
-	first_digit * 10 + second_digit
+	let mut start = 0;
+
+	let mut result = 0;
+	for i in (0..count).rev() {
+		let end = len - i;
+		let area = &battery[start..end];
+
+		let digit = area.iter().max().unwrap();
+		start = start + area.iter().position(|x| x == digit).unwrap() + 1;
+
+		result += (*digit as Voltage) * Voltage::pow(10, i as u32);
+	}
+
+	result
 }
 
 fn parse(input: &str) -> Vec<Vec<Digit>> {
@@ -55,9 +69,13 @@ mod test {
 
 	#[test]
 	fn best_battery_config_test() {
-		assert_eq!(best_battery_config(&[2, 9]), 29);
-		assert_eq!(best_battery_config(&[9, 5, 8, 3, 6]), 98);
-		assert_eq!(best_battery_config(&[3, 5, 8, 3, 6, 9]), 89);
+		assert_eq!(best_battery_config(&[2, 9], 2), 29);
+		assert_eq!(best_battery_config(&[9, 5, 8, 3, 6], 2), 98);
+		assert_eq!(best_battery_config(&[3, 5, 8, 3, 6, 9], 2), 89);
+
+		assert_eq!(best_battery_config(&[3, 5, 8, 3, 6, 9], 1), 9);
+
+		assert_eq!(best_battery_config(&[3, 5, 8, 3, 6, 9], 3), 869);
 	}
 
 	#[test]
@@ -83,6 +101,15 @@ mod test {
 		let result = solver.solve_part_1();
 
 		assert_eq!(result, Some("357".to_string()))
+	}
+
+	#[test]
+	fn part_2_test() {
+		let solver = Solver::new(EXAMPLE_INPUT);
+
+		let result = solver.solve_part_2();
+
+		assert_eq!(result, Some("3121910778619".to_string()))
 	}
 
 	const EXAMPLE_INPUT: &str = "\
