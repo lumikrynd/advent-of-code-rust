@@ -4,6 +4,7 @@ use std::error::Error;
 
 mod day1;
 mod day2;
+mod day3;
 
 pub fn solve_day(
 	mut arguments: impl Iterator<Item = String>,
@@ -24,6 +25,7 @@ fn get_solver<'a>(
 	let solver: Box<dyn PuzzleSolver> = match day {
 		1 => day1::Solver::new(input),
 		2 => day2::Solver::new(input),
+		3 => day3::Solver::new(input),
 		x => Err(AocError::new(&format!("No solver for day {x}")))?,
 	};
 	Ok(solver)
