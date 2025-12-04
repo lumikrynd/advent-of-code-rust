@@ -25,7 +25,9 @@ impl PuzzleSolver for Solver {
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let map = map::Map::new(&self.start_position);
+		let count = map.count_accessible_rolls_recursive();
+		Some(count.to_string())
 	}
 }
 
@@ -38,8 +40,13 @@ mod test {
 	#[test]
 	fn part_1() {
 		let solver = Solver::new(EXAMPLE_INPUT);
-
 		assert_eq!(solver.solve_part_1().unwrap(), "13");
+	}
+
+	#[test]
+	fn part_2() {
+		let solver = Solver::new(EXAMPLE_INPUT);
+		assert_eq!(solver.solve_part_2().unwrap(), "43");
 	}
 
 	const EXAMPLE_INPUT: &str = indoc! {"

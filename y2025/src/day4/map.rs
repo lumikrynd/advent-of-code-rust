@@ -29,10 +29,52 @@ impl Map {
 	}
 
 	pub fn count_accessible_rolls(&self) -> usize {
+		self.accessible_rolls().count()
+	}
+
+	pub fn count_accessible_rolls_recursive(&self) -> usize {
+		let mut temp; //just here to store ownership
+		let mut current = self;
+		let mut result = 0;
+
+		loop {
+			let to_remove: Vec<_> = current.accessible_rolls().collect();
+			let change = to_remove.len();
+			if change == 0 {
+				break;
+			}
+
+			temp = current.new_without(to_remove.iter());
+			current = &temp;
+
+			result += change;
+		}
+
+		result
+	}
+
+	fn new_without<'t, T>(&self, to_remove: T) -> Map
+	where
+		T: Iterator<Item = &'t (usize, usize)>,
+	{
+		let mut new = Map {
+			state: self.state.clone(),
+			..*self
+		};
+		for coord in to_remove {
+			new.remove(*coord);
+		}
+
+		new
+	}
+
+	fn remove(&mut self, (x, y): (usize, usize)) {
+		self.state[y + 1][x + 1] = false;
+	}
+
+	fn accessible_rolls(&self) -> impl Iterator<Item = (usize, usize)> {
 		cartesian_set(0..self.width, 0..self.height)
-			.map(|cord| self.has_roll(cord) && self.is_accessible(cord))
-			.filter(|moveable| *moveable)
-			.count()
+			.filter(|cord| self.has_roll(*cord) && self.is_accessible(*cord))
 	}
 
 	fn has_roll(&self, (x, y): (usize, usize)) -> bool {
@@ -41,8 +83,7 @@ impl Map {
 
 	fn is_accessible(&self, (x, y): (usize, usize)) -> bool {
 		let count = cartesian_set(x..=x + 2, y..=y + 2)
-			.map(|(x, y)| self.state[y][x])
-			.filter(|roll| *roll)
+			.filter(|(x, y)| self.state[*y][*x])
 			.count();
 
 		count < 5 //less than 4 surrounding + self
@@ -100,6 +141,28 @@ mod test {
 			.@@@@@@@."});
 
 		assert_eq!(map.count_accessible_rolls(), 1);
+	}
+
+	#[test]
+	fn count_accessible_rolls_recursive_single() {
+		let map = create_map_from(indoc! {"
+			@@@@@@@@.
+			@@@@@@@@@
+			@@@@@@@@@
+			.@@@@@@@."});
+
+		assert_eq!(map.count_accessible_rolls_recursive(), 1);
+	}
+
+	#[test]
+	fn count_accessible_rolls_recursive_multiround() {
+		let map = create_map_from(indoc! {"
+			@@@@@@@@@.
+			.@@@@@@@@@
+			@@@@@@@@@@
+			..@@@@@@@."});
+
+		assert_eq!(map.count_accessible_rolls_recursive(), 3);
 	}
 
 	fn create_map_from(input: &str) -> Map {
