@@ -26,7 +26,7 @@ impl PuzzleSolver for Solver {
 	}
 }
 
-fn fun_name(batteries: &Vec<Vec<Digit>>, count: usize) -> Voltage {
+fn fun_name(batteries: &[Vec<Digit>], count: usize) -> Voltage {
 	batteries
 		.iter()
 		.map(|battery| best_battery_config(battery, count) as Voltage)

@@ -1,5 +1,5 @@
 pub fn parse(input: &str) -> Vec<Vec<bool>> {
-	input.lines().map(|line| parse_line(line)).collect()
+	input.lines().map(parse_line).collect()
 }
 
 fn parse_line(input: &str) -> Vec<bool> {

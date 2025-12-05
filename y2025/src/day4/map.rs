@@ -9,7 +9,7 @@ pub struct Map {
 }
 
 impl Map {
-	pub fn new(start: &Vec<Vec<bool>>) -> Self {
+	pub fn new(start: &[Vec<bool>]) -> Self {
 		let height = start.len();
 		let width = start.first().map(Vec::len).unwrap_or(0);
 
