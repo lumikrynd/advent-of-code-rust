@@ -2,36 +2,27 @@ use super::Id;
 use super::Range;
 
 pub fn reduce(ranges: &[Range]) -> Vec<Range> {
-	let mut result = Vec::new();
-	for r in ranges {
-		result = combine(result, r);
-	}
-	result
+	let mut ranges: Vec<_> = ranges.iter().collect();
+	ranges.sort_unstable_by_key(|r| r.start());
+	ranges.into_iter().fold(Vec::new(), combine)
 }
 
 fn combine(mut ranges: Vec<Range>, new: &Range) -> Vec<Range> {
-	let result = ranges.iter().enumerate().find(|r| overlap(r.1, new));
-	if let Some((index, _)) = result {
-		let r = ranges.remove(index);
-		let combined = combine_range(&r, new);
-		combine(ranges, &combined)
+	if let Some(last) = ranges.last_mut()
+		&& last.contains(new.start())
+	{
+		*last = combine_range(last, new);
 	} else {
 		ranges.push(new.clone());
-		ranges
 	}
+
+	ranges
 }
 
 fn combine_range(r: &Range, new: &Range) -> Range {
 	let new_start = Id::min(*r.start(), *new.start());
 	let new_end = Id::max(*r.end(), *new.end());
 	new_start..=new_end
-}
-
-fn overlap(r1: &Range, r2: &Range) -> bool {
-	r1.contains(r2.start())
-		|| r1.contains(r2.end())
-		|| r2.contains(r1.start())
-		|| r2.contains(r1.end())
 }
 
 #[cfg(test)]
