@@ -6,6 +6,7 @@ mod day1;
 mod day2;
 mod day3;
 mod day4;
+mod day5;
 
 pub fn solve_day(
 	mut arguments: impl Iterator<Item = String>,
@@ -28,6 +29,7 @@ fn get_solver<'a>(
 		2 => day2::Solver::new(input),
 		3 => day3::Solver::new(input),
 		4 => day4::Solver::new(input),
+		5 => day5::Solver::new(input),
 		x => Err(AocError::new(&format!("No solver for day {x}")))?,
 	};
 	Ok(solver)
