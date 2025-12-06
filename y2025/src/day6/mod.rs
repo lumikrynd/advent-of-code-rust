@@ -1,3 +1,5 @@
+use core::num;
+
 use aoc_helpers::PuzzleSolver;
 
 type Number = usize;
@@ -23,37 +25,21 @@ impl<'l> Solver<'l> {
 
 impl<'l> PuzzleSolver for Solver<'l> {
 	fn solve_part_1(&self) -> Option<String> {
-		let calculatins = self.operators.len();
 		let numbers = part_1_parse(&self.numbers);
-
-		let mut res = 0;
-		for index in 0..calculatins {
-			let opp = get_opp(&self.operators[index]);
-
-			res += numbers
-				.iter()
-				.map(|l| l[index])
-				.reduce(|acc, new| opp(acc, new))
-				.expect("List shouldn't be empty");
-		}
-
+		let res = calculate(numbers, &self.operators);
 		return Some(res.to_string());
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
-	}
-}
-
-fn get_opp(operator: &Operator) -> impl Fn(Number, Number) -> Number {
-	match operator {
-		Operator::Add => |a, b| a + b,
-		Operator::Multiply => |a, b| a * b,
+		let numbers = part_2_parse(&self.numbers);
+		let res = calculate(numbers, &self.operators);
+		return Some(res.to_string());
 	}
 }
 
 fn part_1_parse(raw: &[Vec<&str>]) -> Vec<Vec<Number>> {
-	return raw.iter().map(parse_row).collect();
+	let transposed = transpose(raw);
+	return transposed.iter().map(parse_row).collect();
 
 	fn parse_row(row: &Vec<&str>) -> Vec<Number> {
 		row.iter().map(parse_num).collect()
@@ -61,6 +47,35 @@ fn part_1_parse(raw: &[Vec<&str>]) -> Vec<Vec<Number>> {
 
 	fn parse_num(num: &&str) -> Number {
 		num.trim().parse().expect("invalid number")
+	}
+}
+
+fn transpose<'l>(raw: &[Vec<&'l str>]) -> Vec<Vec<&'l str>> {
+	let problem_length = raw.len();
+	let problems = raw.first().map(|x| x.len()).unwrap_or(0);
+
+	(0..problems)
+		.map(|p| (0..problem_length).map(|l| raw[l][p]).collect())
+		.collect()
+}
+
+fn part_2_parse(numbers: &[Vec<&str>]) -> Vec<Vec<usize>> {
+	todo!()
+}
+
+fn calculate(numbers: Vec<Vec<usize>>, operators: &Vec<Operator>) -> usize {
+	return numbers.iter().zip(operators).map(single_calculation).sum();
+
+	fn single_calculation((n, o): (&Vec<usize>, &Operator)) -> usize {
+		let op = get_operation(o);
+		n.iter().cloned().reduce(op).unwrap_or(0)
+	}
+}
+
+fn get_operation(operator: &Operator) -> impl Fn(Number, Number) -> Number {
+	match operator {
+		Operator::Add => |a, b| a + b,
+		Operator::Multiply => |a, b| a * b,
 	}
 }
 
@@ -123,6 +138,13 @@ mod test {
 	}
 
 	#[test]
+	#[ignore]
+	fn part_2() {
+		let solver = Solver::new(EXAMPLE);
+		assert_eq!(solver.solve_part_2().unwrap(), "3263827")
+	}
+
+	#[test]
 	fn parse_empty() {
 		let result = parse("\n");
 		assert_eq!(result, solver(vec![], vec![]))
@@ -131,9 +153,10 @@ mod test {
 	#[test]
 	fn part_1_parse_test() {
 		let expected = vec![
-			vec![123, 328, 51, 64],
-			vec![45, 64, 387, 23],
-			vec![6, 98, 215, 314],
+			vec![123, 45, 6],
+			vec![328, 64, 98],
+			vec![51, 387, 215],
+			vec![64, 23, 314],
 		];
 		let raw = vec![
 			vec!["123", "328", " 51", "64 "],
