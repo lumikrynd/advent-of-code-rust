@@ -3,8 +3,8 @@ use aoc_helpers::PuzzleSolver;
 type Number = usize;
 
 #[derive(Debug, PartialEq)]
-pub struct Solver {
-	numbers: Vec<Vec<Number>>,
+pub struct Solver<'l> {
+	numbers: Vec<Vec<&'l str>>,
 	operators: Vec<Operator>,
 }
 
@@ -14,23 +14,23 @@ enum Operator {
 	Multiply,
 }
 
-impl Solver {
-	pub fn new(input: &str) -> Box<Self> {
+impl<'l> Solver<'l> {
+	pub fn new(input: &'l str) -> Box<Self> {
 		let s = parse(input);
 		Box::new(s)
 	}
 }
 
-impl PuzzleSolver for Solver {
+impl<'l> PuzzleSolver for Solver<'l> {
 	fn solve_part_1(&self) -> Option<String> {
 		let calculatins = self.operators.len();
+		let numbers = part_1_parse(&self.numbers);
 
 		let mut res = 0;
 		for index in 0..calculatins {
 			let opp = get_opp(&self.operators[index]);
 
-			res += self
-				.numbers
+			res += numbers
 				.iter()
 				.map(|l| l[index])
 				.reduce(|acc, new| opp(acc, new))
@@ -52,20 +52,53 @@ fn get_opp(operator: &Operator) -> impl Fn(Number, Number) -> Number {
 	}
 }
 
-fn parse(input: &str) -> Solver {
+fn part_1_parse(raw: &[Vec<&str>]) -> Vec<Vec<Number>> {
+	return raw.iter().map(parse_row).collect();
+
+	fn parse_row(row: &Vec<&str>) -> Vec<Number> {
+		row.iter().map(parse_num).collect()
+	}
+
+	fn parse_num(num: &&str) -> Number {
+		num.trim().parse().expect("invalid number")
+	}
+}
+
+fn parse<'l>(input: &'l str) -> Solver<'l> {
 	let mut it = input.lines().rev();
-	let operators = it.next().expect("Missing operator line");
+	let op_row = it.next().expect("Missing operator line");
 	let numbers = it.rev();
 
-	let operators = operators.split_whitespace().map(parse_operator).collect();
-	let numbers = numbers.map(parse_number_row).collect();
+	let operators = op_row.split_whitespace().map(parse_operator).collect();
+
+	let mut column_widths: Vec<_> = op_row
+		.split(['*', '+'])
+		.skip(1)
+		.map(|x| x.chars().count())
+		.collect();
+
+	if let Some(k) = column_widths.last_mut() {
+		*k += 1;
+	}
+
+	let numbers = numbers
+		.map(|s| parse_number_row(s, &column_widths))
+		.collect();
 
 	return Solver { numbers, operators };
 
-	fn parse_number_row(row: &str) -> Vec<Number> {
-		row.split_whitespace()
-			.map(|n| n.parse().expect("invalid number"))
-			.collect()
+	fn parse_number_row<'l>(
+		mut row: &'l str,
+		widths: &Vec<usize>,
+	) -> Vec<&'l str> {
+		widths.iter().fold(vec![], move |mut acc, w| {
+			acc.push(&row[0..*w]);
+			row = match row.split_at_checked(*w + 1) {
+				Some((_, r)) => r,
+				None => "",
+			};
+			acc
+		})
 	}
 
 	fn parse_operator(i: &str) -> Operator {
@@ -96,14 +129,30 @@ mod test {
 	}
 
 	#[test]
+	fn part_1_parse_test() {
+		let expected = vec![
+			vec![123, 328, 51, 64],
+			vec![45, 64, 387, 23],
+			vec![6, 98, 215, 314],
+		];
+		let raw = vec![
+			vec!["123", "328", " 51", "64 "],
+			vec![" 45", "64 ", "387", "23 "],
+			vec!["  6", "98 ", "215", "314"],
+		];
+
+		assert_eq!(part_1_parse(&raw), expected);
+	}
+
+	#[test]
 	fn parse_example() {
 		let result = parse(EXAMPLE);
 
 		let expected = solver(
 			vec![
-				vec![123, 328, 51, 64],
-				vec![45, 64, 387, 23],
-				vec![6, 98, 215, 314],
+				vec!["123", "328", " 51", "64 "],
+				vec![" 45", "64 ", "387", "23 "],
+				vec!["  6", "98 ", "215", "314"],
 			],
 			vec![Multiply, Add, Multiply, Add],
 		);
@@ -111,7 +160,10 @@ mod test {
 		assert_eq!(result, expected)
 	}
 
-	fn solver(numbers: Vec<Vec<Number>>, operators: Vec<Operator>) -> Solver {
+	fn solver<'l>(
+		numbers: Vec<Vec<&'l str>>,
+		operators: Vec<Operator>,
+	) -> Solver<'l> {
 		Solver { numbers, operators }
 	}
 
