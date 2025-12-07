@@ -35,11 +35,11 @@ mod test {
 	#[test]
 	fn can_be_used_as_key() {
 		let mut map = HashSet::new();
-		assert_eq!(map.insert(new(1, 2)), true);
-		assert_eq!(map.insert(new(1, 2)), false);
-		assert_eq!(map.insert(new(2, 2)), true);
-		assert_eq!(map.insert(new(1, 3)), true);
-		assert_eq!(map.insert(new(2, 2)), false);
+		assert!(map.insert(new(1, 2)));
+		assert!(!map.insert(new(1, 2)));
+		assert!(map.insert(new(2, 2)));
+		assert!(map.insert(new(1, 3)));
+		assert!(!map.insert(new(2, 2)));
 	}
 
 	fn new(x: usize, y: usize) -> Coordinate<usize> {

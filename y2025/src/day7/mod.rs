@@ -1,4 +1,4 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use aoc_helpers::PuzzleSolver;
 
@@ -26,30 +26,38 @@ impl PuzzleSolver for Solver {
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let res = find_timeline_count(self.start, &self.splitters);
+		Some(res.to_string())
 	}
 }
 
-fn find_split_count(from: Coord, splitters: &Vec<Coord>) -> usize {
+fn find_split_count(from: Coord, splitters: &[Coord]) -> usize {
 	let mut calc = BeamCalculator::new(splitters);
-	calc.find_split_count(from)
+	calc.traverse(from);
+	calc.visited.len()
+}
+
+fn find_timeline_count(from: Coord, splitters: &[Coord]) -> usize {
+	let mut calc = BeamCalculator::new(splitters);
+	calc.traverse(from)
 }
 
 struct BeamCalculator {
 	splitters: Vec<Coord>,
-	visited: HashSet<Coord>,
+	visited: HashMap<Coord, usize>,
 }
 
 impl BeamCalculator {
-	pub fn new(splitters: &Vec<Coord>) -> Self {
+	pub fn new(splitters: &[Coord]) -> Self {
 		assert!(splitters.is_sorted_by_key(|f| f.y()));
 		Self {
-			splitters: splitters.clone(),
-			visited: HashSet::new(),
+			splitters: splitters.to_owned(),
+			visited: HashMap::new(),
 		}
 	}
 
-	pub fn find_split_count(&mut self, from: Coord) -> usize {
+	/// returns alternative timelines
+	pub fn traverse(&mut self, from: Coord) -> usize {
 		let split = self
 			.splitters
 			.iter()
@@ -57,16 +65,19 @@ impl BeamCalculator {
 			.find(|f| f.y() > from.y());
 
 		match split {
-			None => 0,
+			None => 1,
 			Some(c) => {
-				let new = self.visited.insert(*c);
-				if !new {
-					return 0;
+				if let Some(existing) = self.visited.get(c) {
+					return *existing;
 				}
 
+				let c = *c;
 				let (x, y) = (c.x(), c.y());
-				1 + self.find_split_count(Coord::new(x + 1, y))
-					+ self.find_split_count(Coord::new(x - 1, y))
+				let res = self.traverse(Coord::new(x + 1, y))
+					+ self.traverse(Coord::new(x - 1, y));
+
+				self.visited.insert(c, res);
+				res
 			}
 		}
 	}
@@ -84,22 +95,28 @@ mod test {
 	}
 
 	#[test]
+	fn part_2() {
+		let solver = Solver::new(EXAMPLE);
+		assert_eq!(solver.solve_part_2().unwrap(), "40")
+	}
+
+	#[test]
 	fn find_split_empty() {
-		let result = find_split_count(Coord::new(0, 0), &vec![]);
+		let result = find_split_count(Coord::new(0, 0), &[]);
 		assert_eq!(result, 0);
 	}
 
 	#[test]
 	fn find_split_single() {
 		let result =
-			find_split_count(Coord::new(1, 0), &vec![Coord::new(1, 10)]);
+			find_split_count(Coord::new(1, 0), &[Coord::new(1, 10)]);
 		assert_eq!(result, 1);
 	}
 
 	#[test]
 	fn find_split_ignore_above() {
 		let result =
-			find_split_count(Coord::new(1, 14), &vec![Coord::new(1, 10)]);
+			find_split_count(Coord::new(1, 14), &[Coord::new(1, 10)]);
 		assert_eq!(result, 0);
 	}
 
@@ -107,7 +124,7 @@ mod test {
 	fn find_split_merge() {
 		let result = find_split_count(
 			Coord::new(5, 0),
-			&vec![
+			&[
 				Coord::new(5, 2),
 				Coord::new(4, 4),
 				Coord::new(6, 4),
@@ -115,6 +132,33 @@ mod test {
 			],
 		);
 		assert_eq!(result, 4);
+	}
+
+	#[test]
+	fn find_timelines_empty() {
+		let result = find_timeline_count(Coord::new(0, 0), &[]);
+		assert_eq!(result, 1);
+	}
+
+	#[test]
+	fn find_timelines_single() {
+		let result =
+			find_timeline_count(Coord::new(1, 0), &[Coord::new(1, 10)]);
+		assert_eq!(result, 2);
+	}
+
+	#[test]
+	fn find_timelines_merge() {
+		let result = find_timeline_count(
+			Coord::new(5, 0),
+			&[
+				Coord::new(5, 2),
+				Coord::new(4, 4),
+				Coord::new(6, 4),
+				Coord::new(5, 6),
+			],
+		);
+		assert_eq!(result, 6);
 	}
 
 	const EXAMPLE: &str = indoc! {"
