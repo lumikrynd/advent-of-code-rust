@@ -1,5 +1,3 @@
-use core::num;
-
 use aoc_helpers::PuzzleSolver;
 
 type Number = usize;
@@ -27,13 +25,13 @@ impl<'l> PuzzleSolver for Solver<'l> {
 	fn solve_part_1(&self) -> Option<String> {
 		let numbers = part_1_parse(&self.numbers);
 		let res = calculate(numbers, &self.operators);
-		return Some(res.to_string());
+		Some(res.to_string())
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
 		let numbers = part_2_parse(&self.numbers);
 		let res = calculate(numbers, &self.operators);
-		return Some(res.to_string());
+		Some(res.to_string())
 	}
 }
 
@@ -50,6 +48,31 @@ fn part_1_parse(raw: &[Vec<&str>]) -> Vec<Vec<Number>> {
 	}
 }
 
+fn part_2_parse(raw: &[Vec<&str>]) -> Vec<Vec<usize>> {
+	let transposed = transpose(raw);
+	return transposed.iter().map(parse_row).collect();
+
+	fn parse_row(row: &Vec<&str>) -> Vec<Number> {
+		let width = row[0].chars().count();
+
+		(0..width)
+			.rev()
+			.map(|i| recreate_number(row, i))
+			.map(|s| parse_num(&s))
+			.collect()
+	}
+
+	fn recreate_number(row: &[&str], column: usize) -> String {
+		row.iter()
+			.map(|s| s.chars().nth(column).unwrap())
+			.collect()
+	}
+
+	fn parse_num(num: &str) -> Number {
+		num.trim().parse().expect("invalid number")
+	}
+}
+
 fn transpose<'l>(raw: &[Vec<&'l str>]) -> Vec<Vec<&'l str>> {
 	let problem_length = raw.len();
 	let problems = raw.first().map(|x| x.len()).unwrap_or(0);
@@ -59,11 +82,7 @@ fn transpose<'l>(raw: &[Vec<&'l str>]) -> Vec<Vec<&'l str>> {
 		.collect()
 }
 
-fn part_2_parse(numbers: &[Vec<&str>]) -> Vec<Vec<usize>> {
-	todo!()
-}
-
-fn calculate(numbers: Vec<Vec<usize>>, operators: &Vec<Operator>) -> usize {
+fn calculate(numbers: Vec<Vec<usize>>, operators: &[Operator]) -> usize {
 	return numbers.iter().zip(operators).map(single_calculation).sum();
 
 	fn single_calculation((n, o): (&Vec<usize>, &Operator)) -> usize {
@@ -104,7 +123,7 @@ fn parse<'l>(input: &'l str) -> Solver<'l> {
 
 	fn parse_number_row<'l>(
 		mut row: &'l str,
-		widths: &Vec<usize>,
+		widths: &[usize],
 	) -> Vec<&'l str> {
 		widths.iter().fold(vec![], move |mut acc, w| {
 			acc.push(&row[0..*w]);
@@ -138,7 +157,6 @@ mod test {
 	}
 
 	#[test]
-	#[ignore]
 	fn part_2() {
 		let solver = Solver::new(EXAMPLE);
 		assert_eq!(solver.solve_part_2().unwrap(), "3263827")
