@@ -1,7 +1,5 @@
-use std::{
-	collections::{BinaryHeap, HashMap, HashSet},
-	usize,
-};
+use std::cmp::Reverse;
+use std::collections::BinaryHeap;
 
 use graph::*;
 
@@ -52,7 +50,23 @@ impl PuzzleSolver for Solver {
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let target_len = self.boxes.len();
+
+		let mut connections = find_closest_all(&self.boxes);
+		let mut graph = Graph::new();
+
+		let last = loop {
+			let (a, b) = connections.next().expect("");
+			graph.connect(a, b);
+
+			let groups = graph.groups();
+			if groups.len() == 1 && groups[0].len() == target_len {
+				break (a, b);
+			}
+		};
+
+		let result = i64::from(last.0.x()) * i64::from(last.1.x());
+		Some(result.to_string())
 	}
 }
 
@@ -89,7 +103,24 @@ fn find_closest(points: &[Point], count: usize) -> Vec<(Point, Point)> {
 	temp.into_iter().rev().collect()
 }
 
-#[derive(PartialEq, PartialOrd)]
+/// Brute force implementation
+/// Wonder if this can even run...
+fn find_closest_all(points: &[Point]) -> impl Iterator<Item = (Point, Point)> {
+	let mut combinations = combinations_set(points.iter());
+
+	let mut heap = BinaryHeap::new();
+	for (a, b) in combinations.by_ref() {
+		let item = HeapItem::from(*a, *b);
+		heap.push(Reverse(item));
+	}
+
+	std::iter::from_fn(move || heap.pop())
+		.map(|r| r.0)
+		.map(|HeapItem(_, p)| p)
+		.map(fix_order)
+}
+
+#[derive(PartialEq)]
 struct HeapItem(f64, (Point, Point));
 
 impl HeapItem {
@@ -99,11 +130,15 @@ impl HeapItem {
 	}
 }
 
+impl PartialOrd for HeapItem {
+	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+		Some(self.cmp(other))
+	}
+}
+
 impl Ord for HeapItem {
 	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-		self.0
-			.partial_cmp(&other.0)
-			.expect("Let's see if this is relevant")
+		self.0.partial_cmp(&other.0).unwrap()
 	}
 }
 
@@ -145,6 +180,16 @@ mod test {
 		};
 
 		assert_eq!(s.solve_part_1().expect("None"), "40");
+	}
+
+	#[test]
+	fn part_2_test() {
+		let s = Solver {
+			boxes: parse(EXAMPLE),
+			take: 10,
+		};
+
+		assert_eq!(s.solve_part_2().expect("None"), "25272");
 	}
 
 	#[test]

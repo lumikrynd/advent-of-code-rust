@@ -16,15 +16,7 @@ impl Graph {
 	}
 
 	pub fn groups(&self) -> Vec<&HashSet<Point>> {
-		self.groups.iter().filter(|g| g.len() > 0).collect()
-	}
-
-	fn get_group(&self, id: usize) -> HashSet<Point> {
-		self.groups[id].clone()
-	}
-
-	fn members(&self) -> &HashMap<Point, usize> {
-		&self.members
+		self.groups.iter().filter(|g| !g.is_empty()).collect()
 	}
 
 	pub fn new_group(&mut self) -> usize {
@@ -39,6 +31,10 @@ impl Graph {
 	}
 
 	pub fn merge(&mut self, a: usize, b: usize) {
+		if a == b {
+			return;
+		}
+
 		self.new_group();
 		let b_group = self.groups.swap_remove(b);
 
@@ -139,5 +135,18 @@ mod test {
 		assert_eq!(mem[&d], g_id);
 		assert_eq!(mem[&e], g_id);
 		assert_eq!(mem[&f], g_id);
+
+		graph.connect(a, b);
+		assert_eq!(graph.groups().len(), 1);
+	}
+
+	impl Graph {
+		fn get_group(&self, id: usize) -> HashSet<Point> {
+			self.groups[id].clone()
+		}
+
+		fn members(&self) -> &HashMap<Point, usize> {
+			&self.members
+		}
 	}
 }
