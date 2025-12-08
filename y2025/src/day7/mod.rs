@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use aoc_helpers::PuzzleSolver;
 
-type Coord = aoc_helpers::Coordinate<usize>;
+type Coord = aoc_helpers::Point2D<usize>;
 
 mod parsing;
 

@@ -1,4 +1,4 @@
-use aoc_helpers::Coordinate;
+use aoc_helpers::Point2D;
 use std::iter::once;
 use super::*;
 
@@ -9,7 +9,7 @@ pub fn parse(input: &str) -> Solver {
 	Solver { start, splitters }
 }
 
-fn parse_start(first_line: &str) -> aoc_helpers::Coordinate<usize> {
+fn parse_start(first_line: &str) -> aoc_helpers::Point2D<usize> {
 	let start_x = first_line.find('S').unwrap();
 	Coord::new(start_x, 0)
 }
@@ -21,7 +21,7 @@ fn parse_splitters<'l>(lines: impl Iterator<Item = &'l str>) -> Vec<Coord> {
 		.flat_map(|(y, line)| {
 			line.chars().enumerate().filter_map(move |(x, c)| {
 				if c == '^' {
-					Some(Coordinate::new(x, y))
+					Some(Point2D::new(x, y))
 				} else {
 					None
 				}
