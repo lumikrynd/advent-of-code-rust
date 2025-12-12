@@ -75,7 +75,7 @@ fn create_checker(boxes: &[Point]) -> AreaChecker {
 	AreaChecker::new(lines)
 }
 
-fn create_lines(corners: &Vec<Corner>) -> Vec<(Point, Point)> {
+fn create_lines(corners: &[Corner]) -> Vec<(Point, Point)> {
 	let len = corners.len();
 
 	(0..(len - 1))

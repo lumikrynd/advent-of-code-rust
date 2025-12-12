@@ -75,7 +75,7 @@ pub fn Inner(point: Point, direction: Direction) -> Corner {
 fn get_turn(points: (&Point, &Point, &Point)) -> Turn {
 	let x_cmp = points.0.x.cmp(&points.2.x);
 	let y_cmp = points.0.y.cmp(&points.2.y);
-	let point = points.1.clone();
+	let point = *points.1;
 
 	// Assume going up or down
 	let direction = match (y_cmp, x_cmp) {
