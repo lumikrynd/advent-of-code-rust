@@ -146,6 +146,20 @@ fn rotate((x, y): (i64, i64)) -> (i64, i64) {
 	(y, -x)
 }
 
+/*
+Possible fun optimization which isn't needed.
+Instead of storing a vector of the lines and always have to traverse them all
+we could instead have a BTreeMap where (for the horizontal) the key would be x
+and the value would be a vector of pointers to all the horizontal lines which
+exist for that x-value. A new key would be needed for every x-value where a
+line starts or ends. The value would be the same as the previous except the
+line which is added or removed.
+With this we could easily find all active lines for a given point in x, and
+afterwards see if our vertical line crosses any of them.
+
+In practice it seems like a lot more lines would have had to be defined before
+it is even needed.
+ */
 struct AreaChecker {
 	horizontal: Vec<(Point, Point)>,
 	vertical: Vec<(Point, Point)>,
