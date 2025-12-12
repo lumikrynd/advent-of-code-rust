@@ -36,14 +36,9 @@ impl PuzzleSolver for Solver {
 
 #[derive(Debug, PartialEq)]
 struct Machine {
-	lights: Vec<Light>,
+	light_goals: Vec<bool>,
 	buttons: Vec<Button>,
-}
-
-#[derive(Debug, PartialEq)]
-struct Light {
-	should_be_on: bool,
-	joltage: Joltage,
+	joltage_goals: Vec<Joltage>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -55,10 +50,8 @@ type LightIndex = usize;
 type Joltage = u32;
 
 fn find_fewest_presses(machine: &Machine) -> u8 {
-	let goal: Vec<_> = machine.lights.iter().map(|l| l.should_be_on).collect();
-
 	let res = generate_combinations(&machine.buttons)
-		.filter(|comb| is_valid_combination(comb, &goal))
+		.filter(|comb| is_valid_combination(comb, &machine.light_goals))
 		.map(|comb| comb.len())
 		.min()
 		.unwrap_or(0);
@@ -120,12 +113,7 @@ mod test {
 	#[test]
 	fn find_fewest_presses_test() {
 		let machine = Machine(
-			vec![
-				Light(false, 3),
-				Light(true, 5),
-				Light(true, 4),
-				Light(false, 7),
-			],
+			vec![false, true, true, false],
 			vec![
 				Button(vec![3]),
 				Button(vec![1, 3]),
@@ -134,6 +122,7 @@ mod test {
 				Button(vec![0, 2]),
 				Button(vec![0, 1]),
 			],
+			vec![3, 5, 4, 7],
 		);
 
 		assert_eq!(find_fewest_presses(&machine), 2);
@@ -171,15 +160,15 @@ mod test {
 	}
 
 	#[allow(non_snake_case)]
-	fn Machine(lights: Vec<Light>, buttons: Vec<Button>) -> Machine {
-		Machine { lights, buttons }
-	}
-
-	#[allow(non_snake_case)]
-	fn Light(should_be_on: bool, joltage: Joltage) -> Light {
-		Light {
-			should_be_on,
-			joltage,
+	fn Machine(
+		light_goals: Vec<bool>,
+		buttons: Vec<Button>,
+		joltage_goals: Vec<Joltage>,
+	) -> Machine {
+		Machine {
+			light_goals,
+			buttons,
+			joltage_goals,
 		}
 	}
 

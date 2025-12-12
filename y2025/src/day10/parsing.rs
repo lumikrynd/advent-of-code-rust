@@ -1,4 +1,4 @@
-use super::{Button, Light, Machine};
+use super::{Button, Joltage, Machine};
 
 pub fn parse(input: &str) -> Vec<Machine> {
 	input.lines().map(parse_line).collect()
@@ -9,24 +9,15 @@ fn parse_line(input: &str) -> Machine {
 	let (buttons, light_joltage) = rest.rsplit_once(' ').unwrap();
 
 	Machine {
-		lights: parse_lights(light_goal, light_joltage),
+		light_goals: parse_light_goals(light_goal),
 		buttons: parse_buttons(buttons),
+		joltage_goals: parse_joltage(light_joltage),
 	}
 }
 
-fn parse_lights(light_goal: &str, light_joltage: &str) -> Vec<Light> {
+fn parse_light_goals(light_goal: &str) -> Vec<bool> {
 	let light_goal = light_goal.trim_matches(['[', ']']);
-	let light_joltage = light_joltage.trim_matches(['{', '}']);
-
-	light_goal
-		.chars()
-		.zip(light_joltage.split(','))
-		.map(|(goal, jolt)| (parse_light_goal(goal), jolt.parse().unwrap()))
-		.map(|(should_be_on, joltage)| Light {
-			should_be_on,
-			joltage,
-		})
-		.collect()
+	light_goal.chars().map(parse_light_goal).collect()
 }
 
 fn parse_light_goal(s: char) -> bool {
@@ -43,13 +34,13 @@ fn parse_buttons(buttons: &str) -> Vec<Button> {
 
 fn parse_button(button: &str) -> Button {
 	let button = button.trim_matches(['(', ')']);
-
-	let lights = button
-		.split(',')
-		.map(|l| l.parse().unwrap())
-		.collect();
-
+	let lights = button.split(',').map(|l| l.parse().unwrap()).collect();
 	Button { lights }
+}
+
+fn parse_joltage(joltage: &str) -> Vec<Joltage> {
+	let joltage = joltage.trim_matches(['{', '}']);
+	joltage.split(',').map(|j| j.parse().unwrap()).collect()
 }
 
 #[cfg(test)]
@@ -68,12 +59,7 @@ mod test {
 		let result = parse(input);
 		let expected = vec![
 			Machine(
-				vec![
-					Light(false, 3),
-					Light(true, 5),
-					Light(true, 4),
-					Light(false, 7),
-				],
+				vec![false, true, true, false],
 				vec![
 					Button(vec![3]),
 					Button(vec![1, 3]),
@@ -82,15 +68,10 @@ mod test {
 					Button(vec![0, 2]),
 					Button(vec![0, 1]),
 				],
+				vec![3, 5, 4, 7],
 			),
 			Machine(
-				vec![
-					Light(false, 7),
-					Light(false, 5),
-					Light(false, 12),
-					Light(true, 7),
-					Light(false, 2),
-				],
+				vec![false, false, false, true, false],
 				vec![
 					Button(vec![0, 2, 3, 4]),
 					Button(vec![2, 3]),
@@ -98,6 +79,7 @@ mod test {
 					Button(vec![0, 1, 2]),
 					Button(vec![1, 2, 3, 4]),
 				],
+				vec![7, 5, 12, 7, 2],
 			),
 		];
 
@@ -105,15 +87,15 @@ mod test {
 	}
 
 	#[allow(non_snake_case)]
-	fn Machine(lights: Vec<Light>, buttons: Vec<Button>) -> Machine {
-		Machine { lights, buttons }
-	}
-
-	#[allow(non_snake_case)]
-	fn Light(should_be_on: bool, joltage: Joltage) -> Light {
-		Light {
-			should_be_on,
-			joltage,
+	fn Machine(
+		light_goals: Vec<bool>,
+		buttons: Vec<Button>,
+		joltage_goals: Vec<Joltage>,
+	) -> Machine {
+		Machine {
+			light_goals,
+			buttons,
+			joltage_goals,
 		}
 	}
 
