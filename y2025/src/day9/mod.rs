@@ -1,9 +1,6 @@
-use std::{
-	collections::BinaryHeap,
-	iter::once,
-	ops::{Add, Not, Sub},
-	process::Output,
-};
+use std::collections::BinaryHeap;
+use std::iter::once;
+use std::ops::Not;
 
 use aoc_helpers::{PuzzleSolver, combinations_set};
 
@@ -89,30 +86,64 @@ fn create_lines(corners: &Vec<Corner>) -> Vec<(Point, Point)> {
 }
 
 fn create_line(start: Corner, end: Corner) -> (Point, Point) {
-	let (start, end) = if start.point > end.point {
-		(end, start)
-	} else {
-		(start, end)
-	};
-
-	// Inner is made shorter because it shouldn't block
-	// It doesn't block because each direction is either an edge or the inner model.
+	let invert = start.point > end.point;
 	let horizontal = is_horizontal(&start.point, &end.point);
+
+	let s_diff = find_difference(
+		start.corner_type,
+		start.direction,
+		invert,
+		horizontal,
+		false,
+	);
 	let s = start.point;
-	let s = match (start.corner_type, horizontal) {
-		(Type::Outer, _) => start.point,
-		(Type::Inner, true) => Point(s.x + 1, s.y),
-		(Type::Inner, false) => Point(s.x, s.y + 1),
-	};
+	let s = Point(s.x + s_diff.0, s.y + s_diff.1);
 
+	let e_diff = find_difference(
+		end.corner_type,
+		end.direction,
+		invert,
+		horizontal,
+		true,
+	);
 	let e = end.point;
-	let e = match (end.corner_type, horizontal) {
-		(Type::Outer, _) => end.point,
-		(Type::Inner, true) => Point(e.x - 1, e.y),
-		(Type::Inner, false) => Point(e.x, e.y - 1),
-	};
+	let e = Point(e.x + e_diff.0, e.y + e_diff.1);
 
-	(s, e)
+	if s < e { (s, e) } else { (e, s) }
+}
+
+fn find_difference(
+	corner_type: Type,
+	direction: Direction,
+	invert: bool,
+	horizontal: bool,
+	end: bool,
+) -> (i64, i64) {
+	let mut diff = match corner_type {
+		Type::Outer => (-1, -1),
+		Type::Inner => (1, 1),
+	};
+	if end {
+		diff = rotate(diff);
+	}
+	if horizontal {
+		diff = rotate(diff)
+	}
+	if invert {
+		diff = (-diff.0, -diff.1);
+	}
+	if matches!(direction, Direction::Left) {
+		diff = match horizontal {
+			true => (diff.0, -diff.1),
+			false => (-diff.0, diff.1),
+		}
+	}
+	diff
+}
+
+/// Rotate vector clockwise
+fn rotate((x, y): (i64, i64)) -> (i64, i64) {
+	(y, -x)
 }
 
 struct AreaChecker {
@@ -206,6 +237,7 @@ fn parse(input: &str) -> Vec<Point> {
 #[cfg(test)]
 mod test {
 	use super::*;
+	use Direction::*;
 	use indoc::indoc;
 
 	#[test]
@@ -239,23 +271,23 @@ mod test {
 	#[test]
 	fn create_lines_test() {
 		let input = vec![
-			Outer(1, 1),
-			Outer(3, 1),
-			Outer(3, 3),
-			Outer(2, 3),
-			Inner(2, 2),
-			Outer(1, 2),
+			Outer(1, 1, Left),
+			Outer(3, 1, Left),
+			Outer(3, 3, Left),
+			Outer(2, 3, Left),
+			Inner(2, 2, Right),
+			Outer(1, 2, Left),
 		];
 
 		let result = create_lines(&input);
 
 		let expected = vec![
-			(Point(1, 1), Point(3, 1)),
-			(Point(3, 1), Point(3, 3)),
-			(Point(2, 3), Point(3, 3)),
-			(Point(2, 3), Point(2, 3)),
-			(Point(1, 2), Point(1, 2)),
-			(Point(1, 1), Point(1, 2)),
+			(Point(0, 0), Point(4, 0)),
+			(Point(4, 0), Point(4, 4)),
+			(Point(1, 4), Point(4, 4)),
+			(Point(1, 3), Point(1, 4)),
+			(Point(0, 3), Point(1, 3)),
+			(Point(0, 0), Point(0, 3)),
 		];
 
 		assert_eq!(result, expected);
@@ -263,25 +295,37 @@ mod test {
 
 	#[test]
 	fn create_line_test() {
-		let result = create_line(Outer(1, 1), Outer(3, 1));
-		assert_eq!(result, (Point(1, 1), Point(3, 1)), "easy case");
+		let result = create_line(Outer(2, 2, Right), Outer(2, 8, Right));
+		assert_eq!(result, (Point(1, 1), Point(1, 9)), "Up, Outer");
 
-		let result = create_line(Outer(1, 1), Outer(1, 3));
-		assert_eq!(result, (Point(1, 1), Point(1, 3)), "vertical");
+		let result = create_line(Outer(2, 2, Right), Outer(5, 2, Right));
+		assert_eq!(result, (Point(1, 3), Point(6, 3)), "Right, Outer");
+
+		let result = create_line(Inner(2, 2, Right), Inner(2, 8, Right));
+		assert_eq!(result, (Point(3, 3), Point(3, 7)), "Up, Inner");
+
+		let result = create_line(Inner(2, 2, Right), Inner(5, 2, Right));
+		assert_eq!(result, (Point(3, 1), Point(4, 1)), "Right, Inner");
 
 		// Normalize
-		let result = create_line(Outer(3, 1), Outer(1, 1));
-		assert_eq!(result, (Point(1, 1), Point(3, 1)), "normalize hor");
+		let result = create_line(Outer(3, 1, Right), Outer(1, 1, Right));
+		assert_eq!(result, (Point(0, 0), Point(4, 0)), "normalize hor");
 
-		let result = create_line(Outer(1, 3), Outer(1, 1));
-		assert_eq!(result, (Point(1, 1), Point(1, 3)), "normalize vert");
+		let result = create_line(Outer(1, 3, Right), Outer(1, 1, Right));
+		assert_eq!(result, (Point(2, 0), Point(2, 4)), "normalize vert");
 
-		// Expand
-		let result = create_line(Inner(1, 1), Inner(5, 1));
-		assert_eq!(result, (Point(2, 1), Point(4, 1)), "shrink hor");
+		// Left
+		let result = create_line(Outer(2, 2, Left), Outer(2, 8, Left));
+		assert_eq!(result, (Point(3, 1), Point(3, 9)), "Up, Outer, Left");
 
-		let result = create_line(Inner(1, 1), Inner(1, 5));
-		assert_eq!(result, (Point(1, 2), Point(1, 4)), "shrink vert");
+		let result = create_line(Outer(2, 2, Left), Outer(5, 2, Left));
+		assert_eq!(result, (Point(1, 1), Point(6, 1)), "Right, Outer, Left");
+
+		let result = create_line(Inner(2, 2, Left), Inner(2, 8, Left));
+		assert_eq!(result, (Point(1, 3), Point(1, 7)), "Up, Inner, Left");
+
+		let result = create_line(Inner(2, 2, Left), Inner(5, 2, Left));
+		assert_eq!(result, (Point(3, 3), Point(4, 3)), "Right, Inner, Left");
 	}
 
 	#[test]
@@ -310,12 +354,12 @@ mod test {
 		7,3"};
 
 	#[allow(non_snake_case)]
-	fn Outer(x: i64, y: i64) -> Corner {
-		corners::Outer(Point(x, y))
+	fn Outer(x: i64, y: i64, direction: Direction) -> Corner {
+		corners::Outer(Point(x, y), direction)
 	}
 
 	#[allow(non_snake_case)]
-	fn Inner(x: i64, y: i64) -> Corner {
-		corners::Inner(Point(x, y))
+	fn Inner(x: i64, y: i64, direction: Direction) -> Corner {
+		corners::Inner(Point(x, y), direction)
 	}
 }
