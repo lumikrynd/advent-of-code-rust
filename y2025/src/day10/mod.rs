@@ -4,9 +4,13 @@ use std::iter::{from_fn, once};
 use parsing::parse;
 mod parsing;
 
+mod quick_dirty_a_star;
+
 pub struct Solver {
 	machines: Vec<Machine>,
 }
+
+use quick_dirty_a_star::find_fewest_presses as find_fewest_presses_2;
 
 impl Solver {
 	pub fn new(input: &str) -> Box<Self> {
@@ -30,7 +34,15 @@ impl PuzzleSolver for Solver {
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		None
+		let sum: u32 = self
+			.machines
+			.iter()
+			.map(find_fewest_presses_2)
+			.inspect(|r| println!("Value: {}", r))
+			.map(u32::from)
+			.sum();
+
+		Some(sum.to_string())
 	}
 }
 
@@ -48,15 +60,16 @@ struct Button {
 
 type LightIndex = usize;
 type Joltage = u32;
+type Presses = Joltage; //turns out they are the same
 
-fn find_fewest_presses(machine: &Machine) -> u8 {
+fn find_fewest_presses(machine: &Machine) -> Presses {
 	let res = generate_combinations(&machine.buttons)
 		.filter(|comb| is_valid_combination(comb, &machine.light_goals))
 		.map(|comb| comb.len())
 		.min()
 		.unwrap_or(0);
 
-	res as u8
+	res as Presses
 }
 
 fn is_valid_combination(combination: &[&Button], goal: &[bool]) -> bool {
@@ -108,6 +121,12 @@ mod test {
 	fn part_1_test() {
 		let solver = Solver::new(EXAMPLE);
 		assert_eq!(solver.solve_part_1().unwrap(), "7");
+	}
+
+	#[test]
+	fn part_2_test() {
+		let solver = Solver::new(EXAMPLE);
+		assert_eq!(solver.solve_part_2().unwrap(), "33");
 	}
 
 	#[test]
