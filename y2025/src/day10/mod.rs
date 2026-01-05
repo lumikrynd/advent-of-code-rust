@@ -5,12 +5,13 @@ use parsing::parse;
 mod parsing;
 
 mod quick_dirty_a_star;
+mod lp_solver;
 
 pub struct Solver {
 	machines: Vec<Machine>,
 }
 
-use quick_dirty_a_star::find_fewest_presses as find_fewest_presses_2;
+use lp_solver::find_fewest_presses as find_fewest_presses_2;
 
 impl Solver {
 	pub fn new(input: &str) -> Box<Self> {
@@ -23,23 +24,21 @@ impl Solver {
 
 impl PuzzleSolver for Solver {
 	fn solve_part_1(&self) -> Option<String> {
-		let sum: u32 = self
+		let sum: Presses = self
 			.machines
 			.iter()
 			.map(find_fewest_presses)
-			.map(u32::from)
 			.sum();
 
 		Some(sum.to_string())
 	}
 
 	fn solve_part_2(&self) -> Option<String> {
-		let sum: u32 = self
+		let sum: Presses = self
 			.machines
 			.iter()
 			.map(find_fewest_presses_2)
 			.inspect(|r| println!("Value: {}", r))
-			.map(u32::from)
 			.sum();
 
 		Some(sum.to_string())
@@ -150,18 +149,18 @@ mod test {
 	#[test]
 	fn is_valid_combination_test() {
 		let goal = [false, false, false];
-		assert_eq!(is_valid_combination(&[], &goal), true, "empty true");
+		assert!(is_valid_combination(&[], &goal), "empty true");
 
 		let goal = [false, true, false];
-		assert_eq!(is_valid_combination(&[], &goal), false, "empty false");
+		assert!(!is_valid_combination(&[], &goal), "empty false");
 
 		let goal = [false, true, false];
 		let buttons = [&Button(vec![1])];
-		assert_eq!(is_valid_combination(&buttons, &goal), true, "Single press");
+		assert!(is_valid_combination(&buttons, &goal), "Single press");
 
 		let goal = [false, true, false];
 		let buttons = [&Button(vec![2]), &Button(vec![1, 2])];
-		assert_eq!(is_valid_combination(&buttons, &goal), true, "Single press");
+		assert!(is_valid_combination(&buttons, &goal), "Single press");
 	}
 
 	#[test]

@@ -2,6 +2,7 @@ use super::{Button, Joltage, LightIndex, Machine, Presses};
 
 use std::{cmp::Ordering, collections::BinaryHeap, ops::Not};
 
+#[allow(dead_code)]
 pub fn find_fewest_presses(machine: &Machine) -> Presses {
 	let mut search = AStar::new(machine);
 	search.find_solution_length()
