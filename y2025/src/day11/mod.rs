@@ -1,11 +1,11 @@
-use std::{
-	collections::{HashMap, HashSet},
-	ops::AddAssign,
-};
+use std::collections::{HashMap, HashSet};
+use std::ops::AddAssign;
 
 use aoc_helpers::PuzzleSolver;
 
 mod parsing;
+
+type Count = i64;
 
 pub struct Solver<'a> {
 	servers: Vec<Server<'a>>,
@@ -22,20 +22,48 @@ impl<'a> Solver<'a> {
 
 impl<'a> PuzzleSolver for Solver<'a> {
 	fn solve_part_1(&self) -> Option<String> {
+		let result = self.path_count("you", "out");
+		Some(result.to_string())
+	}
+
+	fn solve_part_2(&self) -> Option<String> {
+		let (start, end, mut mid_1, mut mid_2) = ("svr", "out", "dac", "fft");
+		let mut mid_count = self.path_count(mid_1, mid_2);
+
+		if mid_count == 0 {
+			(mid_1, mid_2) = (mid_2, mid_1);
+			mid_count = self.path_count(mid_1, mid_2);
+		}
+
+		let start_count = self.path_count(start, mid_1);
+		let end_count = self.path_count(mid_2, end);
+
+		let result = start_count * mid_count * end_count;
+		Some(result.to_string())
+	}
+}
+
+#[derive(Debug, PartialEq)]
+struct Server<'a> {
+	name: &'a str,
+	out: Vec<&'a str>,
+}
+
+impl<'a> Solver<'a> {
+	fn path_count(&self, from: &'a str, to: &'a str) -> Count {
 		let out_map = output_map(&self.servers);
 		let mut in_map = input_map(&self.servers);
 
 		let mut ready: Vec<_> = in_map
 			.iter()
-			.filter_map(|(key, ins)| ins.is_empty().then_some(key))
-			.cloned()
+			.filter_map(|(key, ins)| ins.is_empty().then_some(*key))
 			.collect();
 
-		let mut values: HashMap<&'a str, i32> = HashMap::new();
-		values.insert("you", 1);
+		let mut values: HashMap<&'a str, Count> = HashMap::new();
+		values.insert(from, 1);
 
 		while let Some(server) = ready.pop() {
-			let server_val = values.entry(server).or_default().clone();
+			let server_val = *values.entry(server).or_default();
 			for out in out_map[server].iter() {
 				values.entry(out).or_default().add_assign(server_val);
 
@@ -48,19 +76,8 @@ impl<'a> PuzzleSolver for Solver<'a> {
 			}
 		}
 
-		let result = values["out"];
-		Some(result.to_string())
+		values[to]
 	}
-
-	fn solve_part_2(&self) -> Option<String> {
-		None
-	}
-}
-
-#[derive(Debug, PartialEq)]
-struct Server<'a> {
-	name: &'a str,
-	out: Vec<&'a str>,
 }
 
 fn output_map<'a>(
@@ -107,6 +124,12 @@ mod test {
 	}
 
 	#[test]
+	fn part_2() {
+		let solver = Solver::new(EXAMPLE_2);
+		assert_eq!(solver.solve_part_2().unwrap_or_default(), "2")
+	}
+
+	#[test]
 	fn input_map_test() {
 		let input = vec![
 			Server("AAA", vec!["BBB", "CCC", "DDD"]),
@@ -115,7 +138,6 @@ mod test {
 
 		let result = input_map(&input);
 
-		let empty: Vec<&str> = vec![];
 		assert_eq!(result["AAA"], HashSet::from([]));
 		assert_eq!(result["BBB"], HashSet::from(["AAA"]));
 		assert_eq!(result["CCC"], HashSet::from(["AAA"]));
@@ -155,4 +177,19 @@ mod test {
 		ggg: out
 		hhh: ccc fff iii
 		iii: out"};
+
+	const EXAMPLE_2: &str = indoc! {"
+		svr: aaa bbb
+		aaa: fft
+		fft: ccc
+		bbb: tty
+		tty: ccc
+		ccc: ddd eee
+		ddd: hub
+		hub: fff
+		eee: dac
+		dac: fff
+		fff: ggg hhh
+		ggg: out
+		hhh: out"};
 }
