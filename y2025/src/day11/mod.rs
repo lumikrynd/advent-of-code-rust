@@ -1,7 +1,6 @@
+use aoc_helpers::PuzzleSolver;
 use std::collections::{HashMap, HashSet};
 use std::ops::AddAssign;
-
-use aoc_helpers::PuzzleSolver;
 
 mod parsing;
 
@@ -59,14 +58,11 @@ impl<'a> Solver<'a> {
 			.filter_map(|(key, ins)| ins.is_empty().then_some(*key))
 			.collect();
 
-		let mut values: HashMap<&'a str, Count> = HashMap::new();
-		values.insert(from, 1);
+		let mut counter = path_counter::PathCounter::new(from);
 
 		while let Some(server) = ready.pop() {
-			let server_val = *values.entry(server).or_default();
 			for out in out_map[server].iter() {
-				values.entry(out).or_default().add_assign(server_val);
-
+				counter.connect(server, out);
 				let removed = in_map.entry(out).or_default().remove(server);
 				assert!(removed);
 
@@ -76,7 +72,34 @@ impl<'a> Solver<'a> {
 			}
 		}
 
-		values[to]
+		counter.get(to)
+	}
+}
+
+///Responsible for keeping count of all paths from one points to any other point
+///Note that "connect" assumes the count of "from" is done.
+mod path_counter {
+	use super::*;
+
+	pub struct PathCounter<'a> {
+		counts: HashMap<&'a str, Count>,
+	}
+
+	impl<'a> PathCounter<'a> {
+		pub fn new(start: &'a str) -> PathCounter<'a> {
+			let mut counts = HashMap::new();
+			counts.insert(start, 1);
+			PathCounter { counts }
+		}
+
+		pub fn connect(&mut self, from: &'a str, to: &'a str) {
+			let from_count = *self.counts.entry(from).or_default();
+			self.counts.entry(to).or_default().add_assign(from_count);
+		}
+
+		pub fn get(&self, name: &'a str) -> Count {
+			self.counts.get(name).cloned().unwrap_or_default()
+		}
 	}
 }
 
